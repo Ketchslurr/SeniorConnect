@@ -6,7 +6,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $stmt = $pdo->prepare("SELECT userId, Username,fname, Age, email, pwd, roleId FROM user_info WHERE email = ?");
+    // $stmt = $pdo->prepare("SELECT userId, Username,fname, Age, email, pwd, roleId FROM user_info WHERE email = ?");
+    $stmt = $pdo->prepare("SELECT ui.userId, ui.Username, ui.fname, ui.Age, ui.email, ui.pwd, ui.roleId, hp.professionalId 
+                       FROM user_info ui 
+                       LEFT JOIN healthcareprofessional hp ON ui.userId = hp.userId 
+                       WHERE ui.email = ?");
+
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 
@@ -17,7 +22,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['age'] = $user['Age'];
         $_SESSION['valid'] = $user['email'];
         $_SESSION['role'] = $user['roleId'];
-
+        
+        if ($user['roleId'] == 3) {
+            $_SESSION['professionalId'] = $user['professionalId'];
+        }
         // Redirect based on role
         switch ($user['roleId']) {
             case 1:

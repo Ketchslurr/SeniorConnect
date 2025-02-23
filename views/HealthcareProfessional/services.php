@@ -7,10 +7,10 @@ if (!isset($_SESSION['userId'])) {
     exit();
 }
 
-$userId = $_SESSION['userId'];
+$userId = $_SESSION['professionalId'];
 
 // Fetch healthcare professional details
-$sql = "SELECT * FROM healthcareprofessional WHERE userId = :userId";
+$sql = "SELECT * FROM healthcareprofessional WHERE professionalId = :userId";
 $stmt = $pdo->prepare($sql);
 $stmt->execute(['userId' => $userId]);
 $professional = $stmt->fetch(PDO::FETCH_ASSOC);

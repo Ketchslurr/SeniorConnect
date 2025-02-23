@@ -8,7 +8,7 @@ if (!isset($_SESSION['userId'])) {
     exit();
 }
 // Fetch available doctors using JOIN
-$sql = "SELECT hp.fname, hp.lname, hp.specialization, hp.profile_picture FROM available_doctors ad JOIN healthcareprofessional hp ON ad.professionalId = hp.userId WHERE ad.is_available = 1;";
+$sql = "SELECT hp.fname, hp.lname, hp.specialization, hp.profile_picture, hp.professionalId FROM available_doctors ad JOIN healthcareprofessional hp ON ad.professionalId = hp.professionalId WHERE ad.is_available = 1;";
 
 $stmt = $pdo->query($sql);
 $doctors = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -42,7 +42,8 @@ $doctors = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <?php endif; ?>
                             <h3 class="text-xl font-semibold"> <?= htmlspecialchars($doctor['fname'] . ' ' . $doctor['lname']) ?> </h3>
                             <p class="text-gray-600 mb-4"> <?= htmlspecialchars($doctor['specialization']) ?> </p>
-                            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition" onclick="window.location.href='bookAppointment.php'">
+                            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition" 
+                                onclick="window.location.href='bookAppointment.php?professionalId=<?= $doctor['professionalId'] ?>'">
                                 Book an Appointment
                             </button>
                         </div>
