@@ -33,6 +33,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $stmt = $pdo->prepare("INSERT INTO healthcareprofessional (userId, fname, lname, age, gender, email) VALUES (?, ?, ?, ?, ?, ?)");
                 $stmt->execute([$userId, $firstName, $lastName, $age, $gender, $email]);
             }
+            if ($roleId == 2) {
+                $stmt = $pdo->prepare("INSERT INTO seniorcitizen (userId, fname, lname, age, gender, email) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$userId, $firstName, $lastName, $age, $gender, $email]);
+            }
 
             unset($_SESSION['roleId']); // Clear role selection after signup
             header("Location: login.php");

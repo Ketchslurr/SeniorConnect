@@ -71,7 +71,7 @@ $services = $stmtServices->fetchAll(PDO::FETCH_ASSOC);
                     <?php endforeach; ?>
                 </ul>
 
-                <button class="mt-6 w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Book Appointment</button>
+                <button class="mt-6 w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition" onclick="window.location.href='appointmentBookingPage.php?professionalId=<?= $professionalId ?>'">Proceed</button>
             </div>
         </main>
     </div>

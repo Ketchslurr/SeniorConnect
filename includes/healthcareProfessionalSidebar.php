@@ -9,7 +9,7 @@
         <a href="healthcareDashboard.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
             <span>🏠</span><span>Dashboard</span>
         </a>
-        <a href="#" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
+        <a href="../HealthcareProfessional/appointments.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
             <span>📅</span><span>Appointments</span>
         </a>
         <a href="#" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">

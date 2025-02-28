@@ -1,17 +1,23 @@
 <?php
 include '../config.php';
 session_start();
+require '../vendor/autoload.php';
 
+$client = new Google\Client();
+$client->setAuthConfig(__DIR__ . '/../auth/client_secret_573751304329-u46e5l3l4o001omab337gl4e9jbsh8a8.apps.googleusercontent.com.json');
+$client->setRedirectUri('http://localhost/senior_connect/auth/oauth-callback.php');
+$client->addScope('email');
+$client->addScope('profile');
+
+// Handle normal login
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    // $stmt = $pdo->prepare("SELECT userId, Username,fname, Age, email, pwd, roleId FROM user_info WHERE email = ?");
     $stmt = $pdo->prepare("SELECT ui.userId, ui.Username, ui.fname, ui.Age, ui.email, ui.pwd, ui.roleId, hp.professionalId 
-                       FROM user_info ui 
-                       LEFT JOIN healthcareprofessional hp ON ui.userId = hp.userId 
-                       WHERE ui.email = ?");
-
+                           FROM user_info ui 
+                           LEFT JOIN healthcareprofessional hp ON ui.userId = hp.userId 
+                           WHERE ui.email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 
@@ -46,6 +52,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error = "Invalid email or password";
     }
 }
+
+// Google Login URL
+$googleAuthUrl = $client->createAuthUrl();
 ?>
 
 <!DOCTYPE html>
@@ -94,16 +103,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Login</button>
             </form>
             
+            <!-- Google Sign-In Button -->
             <div class="mt-4 flex items-center justify-center bg-gray-100 p-2 rounded">
                 <img src="../assets/Images/google.jpg" alt="Google Logo" class="h-6 w-6 mr-2">
-                <a href="#" class="text-gray-700">Sign in with Google Account</a>
+                <a href="<?= htmlspecialchars($googleAuthUrl) ?>" class="text-gray-700">Sign in with Google</a>
             </div>
             
             <p class="text-center text-gray-600 mt-4">Don't have an account? <a href="../views/signup.php" class="text-blue-500 hover:underline">Sign up for free!</a></p>
         </div>
         <div class="md:w-1/2">
-            <img src="../assets/Images/image2.png" alt="Healthcare illustration" 
-            class="w-full max-w-xl mx-auto">
+            <img src="../assets/Images/image2.png" alt="Healthcare illustration" class="w-full max-w-xl mx-auto">
         </div>
     </div>
 </body>

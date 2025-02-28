@@ -8,22 +8,22 @@ if (!isset($_SESSION['userId'])) {
 }
 
 // Check if the request is a POST request
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['serviceId'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $serviceId = $_POST['serviceId'];
-    $userId = $_SESSION['userId'];
-
+    $professionalId = $_SESSION['professionalId'];
+echo "console.log('Service ID: ', $serviceId);";
     try {
         // Verify that the service belongs to the logged-in user
-        $checkQuery = "SELECT * FROM services WHERE serviceId = :serviceId AND professionalId = :userId";
+        $checkQuery = "SELECT * FROM services WHERE serviceId = :serviceId AND professionalId = :professionalId";
         $checkStmt = $pdo->prepare($checkQuery);
-        $checkStmt->execute(['serviceId' => $serviceId, 'userId' => $userId]);
+        $checkStmt->execute(['serviceId' => $serviceId, 'professionalId' => $professionalId]);
         $service = $checkStmt->fetch(PDO::FETCH_ASSOC);
 
         if ($service) {
             // Proceed to delete the service
-            $deleteQuery = "DELETE FROM services WHERE serviceId = :serviceId AND professionalId = :userId";
+            $deleteQuery = "DELETE FROM services WHERE serviceId = :serviceId AND professionalId = :professionalId";
             $deleteStmt = $pdo->prepare($deleteQuery);
-            $deleteStmt->execute(['serviceId' => $serviceId, 'userId' => $userId]);
+            $deleteStmt->execute(['serviceId' => $serviceId, 'professionalId' => $professionalId]);
 
             $_SESSION['success'] = "Service deleted successfully.";
         } else {
@@ -33,9 +33,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['serviceId'])) {
         $_SESSION['error'] = "Error deleting service: " . $e->getMessage();
     }
 } else {
+    echo "error";
     $_SESSION['error'] = "Invalid request.";
 }
-
+echo "<script>alert('Service added successfully!');</script>";
 // Redirect back to the services management page
-header("Location: ../views/healthcareProfessional/services.php");
+header("Location: ../views/healthcareProfessional/services.php?success=Service deleted successfully");
 exit();
