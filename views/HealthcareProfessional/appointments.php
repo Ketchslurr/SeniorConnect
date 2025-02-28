@@ -1,0 +1,219 @@
+<?php
+include '../../config.php';
+session_start();
+
+if (!isset($_SESSION['userId'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Get doctor's ID
+$professionalId = $_SESSION['professionalId'];
+
+// Fetch appointments booked with the doctor
+$sql = "SELECT a.*, s.fname AS senior_name 
+        FROM appointment a
+        JOIN seniorcitizen s ON a.seniorId = s.seniorId
+        WHERE a.professionalId = :professionalId
+        ORDER BY a.appointment_date ASC";
+
+$stmt = $pdo->prepare($sql);
+$stmt->execute(['professionalId' => $professionalId]);
+$appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Prepare events for FullCalendar
+$events = [];
+foreach ($appointments as $row) {
+    $events[] = [
+        'title' => htmlspecialchars($row['service_name']) . " - " . htmlspecialchars($row['appointment_time']),
+        'start' => htmlspecialchars($row['appointment_date']),
+        'id' => htmlspecialchars($row['appointmentId']),
+        'color' => $row['appointment_status'] == 'Confirmed' ? '#007bff' : ($row['appointment_status'] == 'Cancelled' ? '#dc3545' : 'grey'),
+    ];
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Appointments</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
+</head>
+<body class="bg-gray-100">
+    <?php include '../../includes/topbar.php'; ?>
+    <div class="flex">
+        <?php include '../../includes/healthcareProfessionalSidebar.php'; ?>
+        <main class="flex-1 p-6">
+            <h3 class="text-3xl font-bold mb-6 text-center">Appointments</h3>
+            
+            <!-- List View -->
+            <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                <h4 class="text-xl font-bold mb-4">Appointment List</h4>
+                <table class="w-full border-collapse bg-white shadow-md rounded-lg overflow-hidden">
+                    <thead>
+                        <tr class="bg-blue-500 text-white">
+                            <th class="py-3 px-4">Senior Name</th>
+                            <th class="py-3 px-4">Service</th>
+                            <th class="py-3 px-4">Date</th>
+                            <th class="py-3 px-4">Time</th>
+                            <th class="py-3 px-4">Status</th>
+                            <th class="py-3 px-4 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($appointments as $appointment) : ?>
+                            <tr class="border-b">
+                                <td class="py-3 px-4 text-center"><?= htmlspecialchars($appointment['senior_name']) ?></td>
+                                <td class="py-3 px-4 text-center"><?= htmlspecialchars($appointment['service_name']) ?></td>
+                                <td class="py-3 px-4 text-center"><?= htmlspecialchars($appointment['appointment_date']) ?></td>
+                                <td class="py-3 px-4 text-center"><?= htmlspecialchars($appointment['appointment_time']) ?></td>
+                                <td class="py-3 px-4 text-center">
+                                    <?php if ($appointment['appointment_status'] == 'Confirmed'): ?>
+                                        <span class="text-blue-600 font-bold">Confirmed</span>
+                                    <?php elseif ($appointment['appointment_status'] == 'Cancelled'): ?>
+                                        <span class="text-red-600 font-bold">Cancelled</span>
+                                    <?php else: ?>
+                                        <span class="text-black-600 font-bold">Pending</span>
+                                    <?php endif; ?>
+                                </td>
+
+                                <td class="py-3 px-4 text-center">
+                                <button onclick="openConfirmModal(<?= $appointment['appointmentId'] ?>)" 
+                                    class="text-blue-500 text-xl mx-2 cursor-pointer" 
+                                    title="Confirm Appointment">
+                                        ✔️
+                                </button>
+                                <button onclick="openDenyModal(<?= $appointment['appointmentId'] ?>)" 
+                                    class="text-red-500 text-xl mx-2 cursor-pointer" 
+                                    title="Deny Appointment">
+                                        ❌
+                                </button>
+
+
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+
+            </div>
+
+            <!-- Calendar View -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h4 class="text-xl font-bold mb-4">Appointment Calendar</h4>
+                <div id="calendar"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Confirm Modal -->
+    
+    <div id="confirmModal" class="fixed inset-0 hidden bg-gray-900 bg-opacity-50 flex justify-center items-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h3 class="text-xl font-bold mb-4">Confirm Appointment</h3>
+            <p>Are you sure you want to confirm this appointment?</p>
+            <form id="confirmForm" method="POST" action="../../includes/confirmAppointment.php">
+                <input type="hidden" name="appointmentId" id="confirmAppointmentId">
+                <div class="flex justify-center space-x-4 mt-4">
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Confirm</button>
+                    <button type="button" onclick="closeConfirmModal()" class="px-4 py-2 bg-gray-600 text-white rounded">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+    <!-- Deny Modal -->
+    
+    <div id="denyModal" class="fixed inset-0 hidden bg-gray-900 bg-opacity-50 flex justify-center items-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h3 class="text-xl font-bold mb-4">Deny Appointment</h3>
+            <form id="denyForm" method="POST" action="../../includes/denyAppointment.php">
+                <input type="hidden" name="appointmentId" id="denyAppointmentId">
+                <textarea name="denialReason" id="denyMessage" class="w-full p-2 border border-gray-300 rounded" placeholder="Enter reason for denial..." required></textarea>
+                <div class="flex justify-center space-x-4 mt-4">
+                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded">Submit</button>
+                    <button type="button" onclick="closeDenyModal()" class="px-4 py-2 bg-gray-600 text-white rounded">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'en',
+            height: 'auto',
+            events: <?= json_encode($events) ?>,
+        });
+        calendar.render();
+    });
+
+    function openConfirmModal(appointmentId) {
+        document.getElementById('confirmAppointmentId').value = appointmentId;
+        document.getElementById('confirmModal').classList.remove('hidden');
+    }
+
+    function closeConfirmModal() {
+        document.getElementById('confirmModal').classList.add('hidden');
+    }
+
+    function openDenyModal(appointmentId) {
+        document.getElementById('denyAppointmentId').value = appointmentId;
+        document.getElementById('denyModal').classList.remove('hidden');
+    }
+
+    function closeDenyModal() {
+        document.getElementById('denyModal').classList.add('hidden');
+    }
+</script>
+
+
+    <!-- <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'en',
+                height: 'auto',
+                events: <?= json_encode($events) ?>,
+            });
+            calendar.render();
+        });
+
+        function confirmAppointment(id) {
+            fetch('../../includes/confirmAppointment.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'appointmentId=' + id
+            }).then(() => location.reload());
+        }
+
+        function showDenyModal(id) {
+            document.getElementById('denyModal').classList.remove('hidden');
+            document.getElementById('denyModal').dataset.appointmentId = id;
+        }
+
+        function submitDeny() {
+            var id = document.getElementById('denyModal').dataset.appointmentId;
+            var message = document.getElementById('denyMessage').value;
+            fetch('../../includes/denyAppointment.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'appointmentId=' + id + '&message=' + encodeURIComponent(message)
+            }).then(() => location.reload());
+        }
+
+        function closeDenyModal() {
+            document.getElementById('denyModal').classList.add('hidden');
+        }
+    </script> -->
+</body>
+</html>
