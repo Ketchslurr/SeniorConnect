@@ -7,8 +7,22 @@ if (!isset($_SESSION['userId'])) {
     exit();
 }
 
+if (!isset($_SESSION['professionalId'])) {
+    die("Error: Professional ID not set in session.");
+}
+
 // Get doctor's ID
 $professionalId = $_SESSION['professionalId'];
+
+// Function to create a notification
+function createNotification($pdo, $seniorId, $message) {
+    $sql = "INSERT INTO notifications (seniorId, message, created_at) VALUES (:seniorId, :message, NOW())";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([
+        'seniorId' => $seniorId,
+        'message' => $message
+    ]);
+}
 
 // Fetch appointments booked with the doctor
 $sql = "SELECT a.*, s.fname AS senior_name 
@@ -21,6 +35,10 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute(['professionalId' => $professionalId]);
 $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+if (empty($appointments)) {
+    die("No appointments found for this doctor.");
+}
+
 // Prepare events for FullCalendar
 $events = [];
 foreach ($appointments as $row) {
@@ -30,6 +48,39 @@ foreach ($appointments as $row) {
         'id' => htmlspecialchars($row['appointmentId']),
         'color' => $row['appointment_status'] == 'Confirmed' ? '#007bff' : ($row['appointment_status'] == 'Cancelled' ? '#dc3545' : 'grey'),
     ];
+}
+
+// Handle appointment status change
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId']) && isset($_POST['status'])) {
+    $appointmentId = $_POST['appointmentId'];
+    $newStatus = $_POST['status'];
+
+    // Update the appointment status in the database
+    $updateSql = "UPDATE appointment SET appointment_status = :status WHERE appointmentId = :appointmentId";
+    $updateStmt = $pdo->prepare($updateSql);
+    $updateStmt->execute([
+        'status' => $newStatus,
+        'appointmentId' => $appointmentId
+    ]);
+
+    // Fetch the senior ID for the appointment
+    $seniorSql = "SELECT seniorId FROM appointment WHERE appointmentId = :appointmentId";
+    $seniorStmt = $pdo->prepare($seniorSql);
+    $seniorStmt->execute(['appointmentId' => $appointmentId]);
+    $senior = $seniorStmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($senior) {
+        $seniorId = $senior['seniorId'];
+        $message = ($newStatus == 'Confirmed') 
+            ? "Your appointment has been confirmed by the doctor." 
+            : "Your appointment has been declined by the doctor.";
+        
+        // Create notification
+        createNotification($pdo, $seniorId, $message);
+    }
+
+    echo json_encode(['status' => 'success', 'message' => 'Appointment updated successfully']);
+    exit();
 }
 ?>
 
@@ -73,29 +124,30 @@ foreach ($appointments as $row) {
                                 <td class="py-3 px-4 text-center"><?= htmlspecialchars($appointment['appointment_date']) ?></td>
                                 <td class="py-3 px-4 text-center"><?= htmlspecialchars($appointment['appointment_time']) ?></td>
                                 <td class="py-3 px-4 text-center">
-                                    <?php if ($appointment['appointment_status'] == 'Confirmed'): ?>
-                                        <span class="text-blue-600 font-bold">Confirmed</span>
-                                    <?php elseif ($appointment['appointment_status'] == 'Cancelled'): ?>
-                                        <span class="text-red-600 font-bold">Cancelled</span>
-                                    <?php else: ?>
-                                        <span class="text-black-600 font-bold">Pending</span>
-                                    <?php endif; ?>
-                                </td>
+                                <?php if ($appointment['appointment_status'] == 'Confirmed'): ?>
+                                    <span class="text-blue-600 font-bold">Confirmed</span>
+                                <?php elseif ($appointment['appointment_status'] == 'Cancelled'): ?>
+                                    <span class="text-red-600 font-bold">Cancelled</span>
+                                <?php else: ?>
+                                    <span class="text-black-600 font-bold">Pending</span>
+                                <?php endif; ?>
+                            </td>
 
-                                <td class="py-3 px-4 text-center">
-                                <button onclick="openConfirmModal(<?= $appointment['appointmentId'] ?>)" 
-                                    class="text-blue-500 text-xl mx-2 cursor-pointer" 
-                                    title="Confirm Appointment">
-                                        ✔️
-                                </button>
-                                <button onclick="openDenyModal(<?= $appointment['appointmentId'] ?>)" 
-                                    class="text-red-500 text-xl mx-2 cursor-pointer" 
-                                    title="Deny Appointment">
-                                        ❌
-                                </button>
+                            <td class="py-3 px-4 text-center">
+                                <?php if ($appointment['appointment_status'] == 'Pending'): ?>
+                                    <button onclick="openConfirmModal(<?= $appointment['appointmentId'] ?>)" 
+                                        class="text-blue-500 text-xl mx-2 cursor-pointer" 
+                                        title="Confirm Appointment">
+                                            ✔️
+                                    </button>
+                                    <button onclick="openDenyModal(<?= $appointment['appointmentId'] ?>)" 
+                                        class="text-red-500 text-xl mx-2 cursor-pointer" 
+                                        title="Deny Appointment">
+                                            ❌
+                                    </button>
+                                <?php endif; ?>
+                            </td>
 
-
-                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

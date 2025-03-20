@@ -7,24 +7,25 @@ if (!isset($_SESSION['userId'])) {
     exit();
 }
 
-$userId = $_SESSION['professionalId'];
+$userId = $_SESSION['userId'];
+$professionaId = $_SESSION['professionalId'];
 
 // Fetch healthcare professional details
-$sql = "SELECT * FROM healthcareprofessional WHERE professionalId = :userId";
+$sql = "SELECT * FROM healthcareprofessional WHERE userId = :userId";
 $stmt = $pdo->prepare($sql);
 $stmt->execute(['userId' => $userId]);
 $professional = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Fetch services offered
-$servicesQuery = "SELECT * FROM services WHERE professionalId = :userId";
+$servicesQuery = "SELECT * FROM services WHERE professionalId = :professionaId";
 $servicesStmt = $pdo->prepare($servicesQuery);
-$servicesStmt->execute(['userId' => $userId]);
+$servicesStmt->execute(['professionaId' => $professionaId]);
 $services = $servicesStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Check current availability status
-$query = "SELECT is_available FROM available_doctors WHERE professionalId = :userId";
+$query = "SELECT is_available FROM available_doctors WHERE professionalId = :professionaId";
 $stmt = $pdo->prepare($query);
-$stmt->execute(['userId' => $userId]);
+$stmt->execute(['professionaId' => $professionaId]);
 $doctorAvailability = $stmt->fetch(PDO::FETCH_ASSOC);
 $isAvailable = $doctorAvailability ? $doctorAvailability['is_available'] : 0;
 
@@ -52,7 +53,8 @@ $isAvailable = $doctorAvailability ? $doctorAvailability['is_available'] : 0;
             <div class="bg-white p-6 rounded-lg shadow-md mb-6 flex justify-between items-center">
                 <div class="flex items-center space-x-4">
                     <?php if (!empty($professional['profile_picture'])): ?>
-                        <img src="data:image/jpeg;base64,<?= base64_encode($professional['profile_picture']) ?>" class="w-24 h-24 rounded-full border" />
+                        <img id="profilePreview" src="data:image/jpeg;base64,<?= base64_encode($professional['profile_picture']) ?>" class="w-24 h-24 rounded-full border" />
+
                     <?php else: ?>
                         <img src="../../assets/Images/woman.jpg" class="w-24 h-24 rounded-full border" />
                     <?php endif; ?>
@@ -63,16 +65,20 @@ $isAvailable = $doctorAvailability ? $doctorAvailability['is_available'] : 0;
                         
                         <!-- Availability Toggle with Modal -->
                 <div class="flex items-center">
-                <p class="text-xl font-semibold mr-3">Set Availability: </>
+                <p class="text-xl font-semibold mr-3">Set Availability:</p>
 
-                    <form method="POST" action="updateAvailability.php">
-                        <input type="hidden" name="is_available" value="<?= $isAvailable ? 0 : 1 ?>">
-                        <button type="button" onclick="showModal()" 
-                            class="w-14 h-7 rounded-full flex items-center justify-between px-1 transition-all duration-300 <?= $isAvailable ? 'bg-blue-500' : 'bg-gray-300' ?>">
-                            <span class="text-white text-sm"><?= $isAvailable ? 'ON' : 'OFF' ?></span>
-                            <div class="w-5 h-5 bg-white rounded-full shadow-md transform <?= $isAvailable ? 'translate-x-6' : '' ?>"></div>
+                    <form id="availabilityForm">
+                        <input type="hidden" id="availabilityInput" name="is_available" value="<?= $isAvailable ? 1 : 0 ?>">
+                        <button type="button" id="availabilityButton" onclick="toggleAvailability()"
+                            class="w-14 h-7 rounded-full flex items-center justify-between px-1 transition-all duration-300 cursor-pointer focus:outline-none
+                            <?= $isAvailable ? 'bg-blue-500' : 'bg-gray-300' ?>">
+                            <span id="availabilityText" class="text-white text-sm"><?= $isAvailable ? 'ON' : 'OFF' ?></span>
+                            <div id="availabilityToggle" class="w-5 h-5 bg-white rounded-full shadow-md transform <?= $isAvailable ? 'translate-x-6' : '' ?>"></div>
                         </button>
                     </form>
+
+
+
                 </div>
                 <button class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                             onclick="document.getElementById('editProfile').style.display='flex'">
@@ -116,6 +122,13 @@ $isAvailable = $doctorAvailability ? $doctorAvailability['is_available'] : 0;
         </main>
     </div>
 
+<!-- prompt Modal -->
+<div id="statusModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 hidden">
+    <div class="bg-white p-6 rounded-lg shadow-md w-80 text-center">
+        <p id="modalMessage" class="text-lg font-semibold"></p>
+        <button onclick="closeModal()" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">OK</button>
+    </div>
+</div>
 
     <!-- availability Modal -->
 <div id="confirmModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
@@ -246,6 +259,51 @@ $isAvailable = $doctorAvailability ? $doctorAvailability['is_available'] : 0;
 </div>
 
 <script>
+function toggleAvailability() {
+    let button = document.getElementById("availabilityButton");
+    let text = document.getElementById("availabilityText");
+    let toggle = document.getElementById("availabilityToggle");
+    let input = document.getElementById("availabilityInput");
+
+    let newStatus = input.value == "1" ? 0 : 1; // Toggle value
+
+    let formData = new FormData();
+    formData.append("is_available", newStatus);
+
+    fetch("includes/updateAvailability.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json()) // Ensure JSON parsing
+    .then(data => {
+        if (data.success) {
+            input.value = data.is_available; // Update hidden input
+
+            // Toggle button styles
+            if (data.is_available == 1) {
+                button.classList.add("bg-blue-500");
+                button.classList.remove("bg-gray-300");
+                text.textContent = "ON";
+                toggle.classList.add("translate-x-6");
+            } else {
+                button.classList.add("bg-gray-300");
+                button.classList.remove("bg-blue-500");
+                text.textContent = "OFF";
+                toggle.classList.remove("translate-x-6");
+            }
+
+            showModal("Availability updated successfully!");
+        } else {
+            showModal("Failed to update availability: " + data.message);
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        showModal("An error occurred while updating.");
+    });
+}
+
+
       function openDeleteModal(serviceId, serviceName) {
     document.getElementById('deleteServiceId').value = serviceId;
     document.getElementById('deleteMessage').textContent = `Are you sure you want to delete "${serviceName}"?`;
@@ -294,14 +352,24 @@ function closeEditModal() {
     }
 
 
-        function previewImage(event) {
-            const reader = new FileReader();
-            reader.onload = function() {
-                const output = document.getElementById('profilePreview');
-                output.src = reader.result;
-            };
-            reader.readAsDataURL(event.target.files[0]);
-        }
+        // function previewImage(event) {
+        //     const reader = new FileReader();
+        //     reader.onload = function() {
+        //         const output = document.getElementById('profilePreview');
+        //         output.src = reader.result;
+        //     };
+        //     reader.readAsDataURL(event.target.files[0]);
+        // }
     </script>
+    <script>
+function previewImage(event) {
+    var reader = new FileReader();
+    reader.onload = function() {
+        var output = document.getElementById('profilePreview');
+        output.src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
+</script>
 </body>
 </html>

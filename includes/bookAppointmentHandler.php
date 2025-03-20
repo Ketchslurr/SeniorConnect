@@ -7,7 +7,7 @@ if (!isset($_SESSION['userId'])) {
     exit();
 }
 
-$seniorCitizenId = $_SESSION['userId'];  // Assuming userId is the senior citizen's ID
+$seniorCitizenId = $_SESSION['seniorId'];  // Assuming userId is the senior citizen's ID
 $professionalId = isset($_POST['professionalId']) ? intval($_POST['professionalId']) : 0;
 $serviceName = isset($_POST['service_name']) ? trim($_POST['service_name']) : '';
 $appointmentDate = isset($_POST['appointment_date']) ? $_POST['appointment_date'] : '';

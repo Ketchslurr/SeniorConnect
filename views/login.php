@@ -14,10 +14,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $stmt = $pdo->prepare("SELECT ui.userId, ui.Username, ui.fname, ui.Age, ui.email, ui.pwd, ui.roleId, hp.professionalId 
-                           FROM user_info ui 
-                           LEFT JOIN healthcareprofessional hp ON ui.userId = hp.userId 
-                           WHERE ui.email = ?");
+    $stmt = $pdo->prepare("SELECT ui.userId, ui.Username, ui.fname, ui.Age, ui.email, ui.pwd, ui.roleId, 
+                                hp.professionalId, sc.seniorId
+                            FROM user_info ui 
+                            LEFT JOIN healthcareprofessional hp ON ui.userId = hp.userId 
+                            LEFT JOIN seniorcitizen sc ON ui.userId = sc.userId
+                            WHERE ui.email = ?");
+
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 
@@ -29,18 +32,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['valid'] = $user['email'];
         $_SESSION['role'] = $user['roleId'];
         
-        if ($user['roleId'] == 3) {
-            $_SESSION['professionalId'] = $user['professionalId'];
-        }
+        // if ($user['roleId'] == 3) {
+        //     $_SESSION['professionalId'] = $user['professionalId'];
+        // }
+        // else if ($user['roleId'] == 2) {
+        //     $_SESSION['seniorId'] = $user['seniorId'];
+        // }
         // Redirect based on role
         switch ($user['roleId']) {
             case 1:
                 header("Location: ../views/Admin/adminDashboard.php");
                 break;
             case 2:
+                $_SESSION['seniorId'] = $user['seniorId'];
                 header("Location: ../views/SeniorCitizen/seniorCitizenDashboard.php");
                 break;
             case 3:
+                $_SESSION['professionalId'] = $user['professionalId'];
                 header("Location: ../views/HealthcareProfessional/healthcareDashboard.php");
                 break;
             default:

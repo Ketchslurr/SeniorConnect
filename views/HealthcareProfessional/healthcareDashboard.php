@@ -7,6 +7,10 @@ if (!isset($_SESSION['userId'])) {
     exit();
 }
 
+if (!isset($_SESSION['professionalId'])) {
+    header("Location: login.php");
+    exit();
+}
 // Get the current date
 $currentDate = date('Y-m-d');
 
@@ -45,16 +49,16 @@ foreach ($appointments as $row) {
         <?php include '../../includes/healthcareProfessionalSidebar.php'; ?>
 
         <main class="flex-1 p-6">
-            <h2 class="text-3xl font-bold text-center mb-6">Welcome, Senior User!</h2>
+            <h2 class="text-3xl font-bold text-center mb-6">Welcome, Doctor!</h2>
             <p class="text-gray-700 text-center mb-6">Your health data and monitoring system is available here.</p>
 
             <!-- Centered Book Now Button -->
-            <div class="flex items-center justify-center mb-6">
+            <!-- <div class="flex items-center justify-center mb-6">
                 <button onclick="window.location.href='views/login.php'"
                     class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-lg">
                     BOOK NOW
                 </button>
-            </div>
+            </div> -->
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Notifications Section -->

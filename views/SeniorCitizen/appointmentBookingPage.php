@@ -1,5 +1,6 @@
 <?php
 include '../../config.php';
+include '../../includes/functions.php';
 session_start();
 
 if (!isset($_SESSION['userId'])) {
@@ -235,7 +236,7 @@ document.getElementById("confirmAppointment").addEventListener("click", function
     .then(data => {
         alert(data.message);
         if (data.status === "success") {
-            window.location.href = "telehealth.php"; // Redirect to appointment list
+            window.location.href = "appointments.php"; // Redirect to appointment list
         }
     })
     .catch(error => console.error("Error:", error));

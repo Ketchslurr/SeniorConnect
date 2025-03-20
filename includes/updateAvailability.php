@@ -27,6 +27,6 @@ if ($doctor) {
     $insertStmt = $pdo->prepare($insertQuery);
     $insertStmt->execute(['doctorId' => $doctorId, 'isAvailable' => $isAvailable]);
 }
-header("Location: ../views/HealthcareProfessional/services.php?success=Service added successfully");
+header("Location: ../views/HealthcareProfessional/services.php?success=Availability changed successfully");
 echo "Availability updated successfully.";
 ?>

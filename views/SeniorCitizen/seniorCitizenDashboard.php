@@ -7,13 +7,13 @@ if (!isset($_SESSION['userId'])) {
     exit();
 }
 
-// Get the current date
+$seniorId = $_SESSION['seniorId']; // Use session ID to get only the logged-in user's appointments
 $currentDate = date('Y-m-d');
 
-// Fetch upcoming appointments
-$sql = "SELECT * FROM healthappointments WHERE appointment_date >= :currentDate ORDER BY appointment_date ASC LIMIT 5";
+// Fetch upcoming appointments for this senior
+$sql = "SELECT * FROM appointment WHERE seniorId = :seniorId AND appointment_date >= :currentDate ORDER BY appointment_date ASC";
 $stmt = $pdo->prepare($sql);
-$stmt->execute(['currentDate' => $currentDate]);
+$stmt->execute(['seniorId' => $seniorId, 'currentDate' => $currentDate]);
 $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Prepare events for FullCalendar
@@ -23,6 +23,7 @@ foreach ($appointments as $row) {
         'title' => "Appointment ID: " . htmlspecialchars($row['appointmentId']),
         'start' => htmlspecialchars($row['appointment_date']),
         'color' => '#007bff', // Blue color for events
+        'url' => 'appointments.php?appointmentId=' . htmlspecialchars($row['appointmentId']) // Make event clickable
     ];
 }
 ?>
@@ -40,7 +41,6 @@ foreach ($appointments as $row) {
 </head>
 <body class="bg-gray-100">
     <?php include '../../includes/topbar.php'; ?>
-
     <div class="flex">
         <?php include '../../includes/seniorCitizenSidebar.php'; ?>
 
@@ -59,35 +59,23 @@ foreach ($appointments as $row) {
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Notifications Section -->
                 <div class="bg-white p-6 rounded-lg shadow-md">
-                    <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-2xl font-bold mb-4">Notifications</h3>
-                    <div class="border-l-4 border-red-500 bg-red-100 p-4 mb-3">
-                        <p><strong>Urgent:</strong> Your appointment is scheduled for <strong>October 15, 2023</strong> at <strong>10:00 AM</strong>. Please confirm your attendance.</p>
-                    </div>
-                    <div class="border-l-4 border-blue-500 bg-blue-100 p-4">
-                        <p><strong>Upcoming:</strong> Your telehealth session is confirmed for <strong>October 20, 2023</strong>.</p>
-                    </div>
-                    </div>
-                    <!-- Upcoming Appointments Section -->
-                    <div class="bg-white p-6 rounded-lg shadow-md mt-6">
-                        <h3 class="text-2xl font-bold mb-4">Upcoming Appointments</h3>
-                        <div class="space-y-4">
-                            <?php if (!empty($appointments)) { 
-                                foreach ($appointments as $row) { ?>
-                                    <div class="border-l-4 border-green-500 bg-green-100 p-4">
+                    <h3 class="text-2xl font-bold mb-4">Upcoming Appointments</h3>
+                    <div class="space-y-4">
+                        <?php if (!empty($appointments)) { 
+                            foreach ($appointments as $row) { ?>
+                                <a href="appointments.php?appointmentId=<?= htmlspecialchars($row['appointmentId']) ?>" class="block">
+                                    <div class="border-l-4 border-green-500 bg-green-100 p-4 hover:bg-green-200 transition">
                                         <p><strong>Appointment ID:</strong> <?= htmlspecialchars($row['appointmentId']) ?></p>
-                                        <p><strong>Senior Citizen ID:</strong> <?= htmlspecialchars($row['seniorCitizenId']) ?></p>
-                                        <p><strong>Healthcare ID:</strong> <?= htmlspecialchars($row['healthcareId']) ?></p>
                                         <p><strong>Date:</strong> <?= htmlspecialchars($row['appointment_date']) ?></p>
                                         <p><strong>Status:</strong> <?= htmlspecialchars($row['appointment_status']) ?></p>
                                     </div>
-                                <?php } 
-                            } else { ?>
-                                <div class="border-l-4 border-gray-500 bg-gray-100 p-4">
-                                    <p>No upcoming appointments.</p>
-                                </div>
-                            <?php } ?>
-                        </div>
+                                </a>
+                            <?php } 
+                        } else { ?>
+                            <div class="border-l-4 border-gray-500 bg-gray-100 p-4">
+                                <p>No upcoming appointments.</p>
+                            </div>
+                        <?php } ?>
                     </div>
                 </div>
 
@@ -97,8 +85,6 @@ foreach ($appointments as $row) {
                     <div id="calendar"></div>
                 </div>
             </div>
-
-            
         </main>
     </div>
 
@@ -110,6 +96,10 @@ foreach ($appointments as $row) {
                 initialView: 'dayGridMonth',
                 locale: 'en',
                 events: <?= json_encode($events) ?>,
+                eventClick: function(info) {
+                    window.location.href = info.event.url;
+                    info.jsEvent.preventDefault(); // Prevent default behavior
+                }
             });
             calendar.render();
         });

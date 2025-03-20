@@ -1,19 +1,22 @@
 <?php
 include '../../config.php';
+
 session_start();
 
-if (!isset($_SESSION['userId'])) {
+if (!isset($_SESSION['userId']) || !isset($_SESSION['seniorId'])) {
     header("Location: login.php");
     exit();
 }
+
+$seniorId = $_SESSION['seniorId'];
 
 // Get the current date
 $currentDate = date('Y-m-d');
 
 // Fetch upcoming appointments
-$sql = "SELECT * FROM appointment WHERE appointment_date >= :currentDate ORDER BY appointment_date ASC";
+$sql = "SELECT * FROM appointment WHERE seniorId = :seniorId AND appointment_date >= :currentDate ORDER BY appointment_date ASC";
 $stmt = $pdo->prepare($sql);
-$stmt->execute(['currentDate' => $currentDate]);
+$stmt->execute(['seniorId' => $seniorId, 'currentDate' => $currentDate]);
 $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Prepare events for FullCalendar
