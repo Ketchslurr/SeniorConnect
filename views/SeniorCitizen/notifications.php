@@ -36,10 +36,10 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="space-y-4">
                     <?php if (!empty($notifications)) {
                         foreach ($notifications as $notif) { ?>
-                            <div class="border-l-4 <?php echo $notif['status'] == 'unread' ? 'border-blue-500' : 'border-gray-500'; ?> bg-gray-100 p-4">
-                                <p><strong><?= htmlspecialchars($notif['message']) ?></strong></p>
-                                <p class="text-sm text-gray-600">Received on: <?= htmlspecialchars($notif['timestamp']) ?></p>
-                            </div>
+                            <a href="<?= htmlspecialchars($notif['link']) ?>" target="_blank" class="block border-l-4 border-blue-500 bg-blue-100 p-4 rounded-lg hover:bg-blue-200 transition">
+                                <p class="font-semibold"><?= htmlspecialchars($notif['message']) ?></p>
+                                <p class="text-sm text-gray-600">Received on: <?= htmlspecialchars($notif['created_at']) ?></p>
+                            </a>
                         <?php }
                     } else { ?>
                         <div class="border-l-4 border-gray-500 bg-gray-100 p-4">

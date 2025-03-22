@@ -66,7 +66,7 @@ $services = $stmtServices->fetchAll(PDO::FETCH_ASSOC);
                     <?php foreach ($services as $service): ?>
                         <li class="flex justify-between p-3 bg-gray-50 rounded-lg shadow">
                             <span><?= htmlspecialchars($service['service_name']) ?></span>
-                            <span class="font-semibold text-blue-600">$<?= htmlspecialchars($service['price']) ?></span>
+                            <span class="font-semibold text-blue-600">₱<?= htmlspecialchars($service['price']) ?></span>
                         </li>
                     <?php endforeach; ?>
                 </ul>

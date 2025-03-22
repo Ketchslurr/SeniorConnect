@@ -1,14 +1,14 @@
 <?php
-include '../../config.php';
-// require_once '../../tcpdf/tcpdf.php';
-include '../../vendor/autoload.php';
-use TCPDF;
 session_start();
+include '../../config.php';
 
+// Debugging session issue
 if (!isset($_SESSION['userId'])) {
-    header("Location: login.php");
-    exit();
+    die("Session userId not set. Check login session handling.");
 }
+
+// Ensure TCPDF is correctly included
+require_once '../../vendor/tecnickcom/tcpdf/tcpdf.php';
 
 $appointments = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

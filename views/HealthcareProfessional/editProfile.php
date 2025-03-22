@@ -32,11 +32,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Prepare SQL query
         if ($profile_picture !== null) {
-            $sql = "UPDATE healthcareprofessional SET fname = :fname, lname = :lname, email = :email, specialization = :specialization, profile_picture = :profile_picture WHERE userId = :userId";
+            $sql = "UPDATE healthcareprofessional SET fname = :fname, lname = :lname, doctorEmail = :email, specialization = :specialization, profile_picture = :profile_picture WHERE userId = :userId";
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(':profile_picture', $profile_picture, PDO::PARAM_LOB);
         } else {
-            $sql = "UPDATE healthcareprofessional SET fname = :fname, lname = :lname, email = :email, specialization = :specialization WHERE userId = :userId";
+            $sql = "UPDATE healthcareprofessional SET fname = :fname, lname = :lname, doctorEmail = :email, specialization = :specialization WHERE userId = :userId";
             $stmt = $pdo->prepare($sql);
         }
 

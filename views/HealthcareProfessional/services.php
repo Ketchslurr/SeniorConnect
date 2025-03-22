@@ -168,7 +168,7 @@ $isAvailable = $doctorAvailability ? $doctorAvailability['is_available'] : 0;
                 </div>
                 <div class="mb-4">
                     <label class="block text-gray-700">Email</label>
-                    <input type="email" name="email" value="<?= htmlspecialchars($professional['email']) ?>" class="w-full p-2 border rounded" required>
+                    <input type="email" name="email" value="<?= htmlspecialchars($professional['doctorEmail']) ?>" class="w-full p-2 border rounded" required>
                 </div>
                 <div class="mb-4">
                     <label class="block text-gray-700">Specialization</label>

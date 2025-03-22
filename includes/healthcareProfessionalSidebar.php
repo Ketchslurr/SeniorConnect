@@ -15,17 +15,17 @@
         <a href="../HealthcareProfessional/patients.php#" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
             <span>🧑</span><span>Patients</span>
         </a>
-        <a href="../HealthcareProfessional/reports.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
+        <!-- <a href="../HealthcareProfessional/report.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
             <span>📊</span><span>Reports</span>
-        </a>
+        </a> -->
         <a href="../HealthcareProfessional/services.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
             <span>🛠</span><span>Services</span>
         </a>
-        <a href="#" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
-            <span>💬</span><span>Forum</span>
+        <a href="../HealthcareProfessional/meeting.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
+            <span>💬</span><span>Meeting</span>
         </a>
-        <a href="#" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
+        <!-- <a href="#" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
             <span>⚙️</span><span>Settings</span>
-        </a>
+        </a> -->
     </nav>
 </aside>

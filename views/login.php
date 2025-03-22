@@ -15,7 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['password'];
 
     $stmt = $pdo->prepare("SELECT ui.userId, ui.Username, ui.fname, ui.Age, ui.email, ui.pwd, ui.roleId, 
-                                hp.professionalId, sc.seniorId
+                                hp.professionalId, hp.doctorEmail, sc.seniorId, sc.seniorEmail
                             FROM user_info ui 
                             LEFT JOIN healthcareprofessional hp ON ui.userId = hp.userId 
                             LEFT JOIN seniorcitizen sc ON ui.userId = sc.userId
@@ -49,6 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 break;
             case 3:
                 $_SESSION['professionalId'] = $user['professionalId'];
+                $_SESSION['doctorEmail'] = $user['doctorEmail'];
                 header("Location: ../views/HealthcareProfessional/healthcareDashboard.php");
                 break;
             default:

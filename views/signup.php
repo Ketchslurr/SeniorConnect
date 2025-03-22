@@ -30,11 +30,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Insert into healthcareprofessional table if roleId is 3
             if ($roleId == 3) {
-                $stmt = $pdo->prepare("INSERT INTO healthcareprofessional (userId, fname, lname, age, gender, email) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt = $pdo->prepare("INSERT INTO healthcareprofessional (userId, fname, lname, age, gender, doctorEmail) VALUES (?, ?, ?, ?, ?, ?)");
                 $stmt->execute([$userId, $firstName, $lastName, $age, $gender, $email]);
             }
             if ($roleId == 2) {
-                $stmt = $pdo->prepare("INSERT INTO seniorcitizen (userId, fname, lname, age, gender, email) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt = $pdo->prepare("INSERT INTO seniorcitizen (userId, fname, lname, age, gender, seniorEmail) VALUES (?, ?, ?, ?, ?, ?)");
                 $stmt->execute([$userId, $firstName, $lastName, $age, $gender, $email]);
             }
 

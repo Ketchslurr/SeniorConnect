@@ -81,7 +81,7 @@ $services = $stmtServices->fetchAll(PDO::FETCH_ASSOC);
                     <?php foreach ($services as $service): ?>
                         <button class="service-btn p-3 bg-gray-50 rounded-lg shadow transition w-40" data-service="<?= $service['service_name'] ?>">
                             <?= htmlspecialchars($service['service_name']) ?> 
-                            <span class="price text-blue-600 block">$<?= htmlspecialchars($service['price']) ?></span>
+                            <span class="price text-blue-600 block">₱<?= htmlspecialchars($service['price']) ?></span>
                         </button>
                     <?php endforeach; ?>
                 </div>
@@ -181,23 +181,6 @@ $services = $stmtServices->fetchAll(PDO::FETCH_ASSOC);
         .catch(error => console.error("Error fetching slots:", error));
 }
 
-
-        // function loadAvailableTimeSlots(date) {
-        //     const timeSlots = document.getElementById("timeSlots");
-        //     timeSlots.innerHTML = "";
-        //     const hours = [9, 10, 11, 12, 13, 14, 15, 16];
-
-        //     hours.forEach(hour => {
-        //         const slot = document.createElement("button");
-        //         slot.textContent = `${hour}:00`;
-        //         slot.classList.add("p-2", "border", "rounded", "text-center", "cursor-pointer", "hover:bg-blue-100");
-        //         slot.addEventListener("click", function () {
-        //             document.querySelectorAll("#timeSlots button").forEach(btn => btn.classList.remove("bg-blue-500", "text-white"));
-        //             this.classList.add("bg-blue-500", "text-white");
-        //         });
-        //         timeSlots.appendChild(slot);
-        //     });
-        // }
     });
 
 
@@ -236,7 +219,9 @@ document.getElementById("confirmAppointment").addEventListener("click", function
     .then(data => {
         alert(data.message);
         if (data.status === "success") {
-            window.location.href = "appointments.php"; // Redirect to appointment list
+            // window.location.href = "appointments.php"; // Redirect to appointment list
+            window.location.href = `payment.php?professionalId=${professionalId}&service=${encodeURIComponent(selectedService)}&date=${selectedDate}&time=${encodeURIComponent(selectedTime)}`;
+
         }
     })
     .catch(error => console.error("Error:", error));
@@ -245,37 +230,6 @@ document.getElementById("confirmAppointment").addEventListener("click", function
 </script>
 
 
-    <!-- <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            let selectedDate = "";
-            
-            flatpickr("#appointmentDate", {
-                inline: true, // This makes the calendar always visible
-                dateFormat: "Y-m-d",
-                minDate: "today",
-                onChange: function(selectedDates, dateStr) {
-                    selectedDate = dateStr;
-                    loadAvailableTimeSlots(dateStr);
-                }
-            });
-            
-            function loadAvailableTimeSlots(date) {
-                const timeSlots = document.getElementById("timeSlots");
-                timeSlots.innerHTML = "";
-                const hours = [9, 10, 11, 12, 13, 14, 15, 16];
-                
-                hours.forEach(hour => {
-                    const slot = document.createElement("button");
-                    slot.textContent = `${hour}:00`;
-                    slot.classList.add("p-2", "border", "rounded", "text-center", "cursor-pointer", "hover:bg-blue-100");
-                    slot.addEventListener("click", function() {
-                        document.querySelectorAll("#timeSlots button").forEach(btn => btn.classList.remove("bg-blue-500", "text-white"));
-                        this.classList.add("bg-blue-500", "text-white");
-                    });
-                    timeSlots.appendChild(slot);
-                });
-            }
-        });
-    </script> -->
+   
 </body>
 </html>

@@ -7,7 +7,7 @@ if (!isset($_SESSION['userId'])) {
     exit();
 }
 
-$doctorId = $_SESSION['userId'];
+$doctorId = $_SESSION['professionalId'];
 $isAvailable = isset($_POST['is_available']) ? (int)$_POST['is_available'] : 0;
 
 // Check if doctor already exists in the available_doctors table

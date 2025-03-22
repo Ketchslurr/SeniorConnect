@@ -27,6 +27,7 @@ foreach ($appointments as $row) {
         'start' => htmlspecialchars($row['appointment_date']),
         'id' => htmlspecialchars($row['appointmentId']),
         'color' => '#007bff', // Blue color for events
+        'meetingLink' => !empty($row['meeting_link']) ? htmlspecialchars($row['meeting_link']) : null, // Add meeting link
     ];
 }
 ?>
@@ -73,34 +74,44 @@ foreach ($appointments as $row) {
 
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                locale: 'en',
-                height: 'auto',
-                events: <?= json_encode($events) ?>,
-                eventClick: function(info) {
-                    var details = info.event.title.split(" - ");
-                    document.getElementById('modalService').textContent = details[0];
-                    document.getElementById('modalTime').textContent = details[1];
-                    document.getElementById('modalDate').textContent = info.event.start.toISOString().split('T')[0];
-                    document.getElementById('meetLink').href = "https://meet.google.com/" + info.event.id;
-                    document.getElementById('appointmentModal').classList.remove('hidden');
-                },
-                eventMouseEnter: function(info) {
-                    info.el.style.cursor = 'pointer';  // Change cursor to pointer on hover
-                },
-                eventMouseLeave: function(info) {
-                    info.el.style.cursor = 'default';  // Revert to default when not hovering
-                }
-            });
-            calendar.render();
-        });
+       document.addEventListener('DOMContentLoaded', function () {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'en',
+        height: 'auto',
+        events: <?= json_encode($events) ?>,
+        eventClick: function(info) {
+            var details = info.event.title.split(" - ");
+            document.getElementById('modalService').textContent = details[0];
+            document.getElementById('modalTime').textContent = details[1];
+            document.getElementById('modalDate').textContent = info.event.start.toISOString().split('T')[0];
 
-        function closeModal() {
-            document.getElementById('appointmentModal').classList.add('hidden');
+            // Use the correct meeting link from FullCalendar event data
+            var meetLink = info.event.extendedProps.meetingLink;
+            if (meetLink) {
+                document.getElementById('meetLink').href = meetLink;
+                document.getElementById('meetLink').classList.remove('hidden'); // Show the link
+            } else {
+                document.getElementById('meetLink').href = "#";
+                document.getElementById('meetLink').classList.add('hidden'); // Hide the link if not available
+            }
+
+            document.getElementById('appointmentModal').classList.remove('hidden');
+        },
+        eventMouseEnter: function(info) {
+            info.el.style.cursor = 'pointer';
+        },
+        eventMouseLeave: function(info) {
+            info.el.style.cursor = 'default';
         }
+    });
+    calendar.render();
+});
+
+function closeModal() {
+    document.getElementById('appointmentModal').classList.add('hidden');
+}
     </script>
 </body>
 </html>

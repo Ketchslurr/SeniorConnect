@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "seniorconnect-449710",
+  "private_key_id": "bfca9c360e164cdba00349bfd319df247b9b3f59",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQChtyrHAgcQSroi\nqR0ij4/WbWS/67J6sVBAbozARL88Ri70CU2vKkxx4lg1cwl0m2lPekujOk+sf5sZ\nh7mYtv3vLNlZy8PBu/6NmVBHgdjWR+UKR3nilka4hY/fMujtZSUQJ++Qikrkv7cg\ntpt0KcnbgHkI2SGtucojm8WP0Umaz7Uhm/CWL+aqOYBhyKwCkcWqeOFwBXzDCjGx\ngUkVCwUhoFwDZLhUibyc+JTJewnjzH1R8a/rD60D2svkoIP0hLRLIsbGGxuzSwyD\n4stssDhVT2VfNGyaZY+SMs3aazl/nOcbVjGYwcOpDkQVOEQ7cbAdrwk7chool8Tl\nPo6nqZuPAgMBAAECggEAP9FwET8smHJVCG6ir8vl4KIlG1QhiCfHWtYFt66ppVix\nGN8/B/xyVJMVampuddUK9zF0/gJ6BMIK7EVSqgC1L5kMYVJ3e1H8P9ccBkwozU9s\nBOV2JURWvmT/BP8rStwah0irUugwbBt4YnGN4YbIQVZu7V3623sxWWIU0g+us2fa\nG4RUN9hZWeuMcpWP3g1B9S78hY9NLuk/9DjTp+7cbwfznpdyTmaAC+EnYejwa2S3\nQVT/nEkAlznnvOoK8Z8/bAYeblionpdJYuJG9j/12hJwt0/PQV/IqaHdF5V2ZLSG\nVmGWuBaM30oOxpyIzv4cGpEtRbJifFwfvsxWVBB/AQKBgQDP0hLKKYMGBOFvSnTC\nRsd7o3ZuvRz5lPO3KdjR9qd0yPjBFxOzRbpHyA7Nx4yq1TYpxNvwOz8wiOVlKwni\niKK8jTHs6RUIiwvC/Q5wI3GBeodUwshB3r9wRocb6XZvOWu6sWI7hdeTYPYY8N3S\n0LdtLK7KLkUzAYFFziyy54a7DwKBgQDHNM5U/o0NcWYPMHgqgw1FXGSXu6FivbzZ\ny+YxP7in719Z2KNTQYqHryi317tA0HlWc2qHQ3sxmOp2yCQeT8yd3NP+MgoYCNxQ\ncaP8LYzezcrCYxsp1yBRB817EgpwHmRMP245YrZZ/qPGDcg2DTB53s4aYSVrArcn\npjLRipkXgQKBgCQCprbZEpcMaXO7VxgC47YM0QzHQCoPIVvvqF5ZexLFcDUlJoi9\n4FVn2QjXNwyy/TunnOS3n29tiTJKjt/uBSTe4nPGv5pHXbZf2wybV6Oz85dAWSrw\nygNOdULk5VzIel5TNk5SFtS2zG3t7sIE4IPOZksqUVtRO3E5FI27iKEJAoGAco86\nrYRqJ7X0JH4STRhqtF3K97uOtxM4nOP2sJHdpq4xXqEIZCPH//nKZ9dnt4Fsljvv\nonQ7T62KAN9ebhQkLxDE1WV/iozl7lk8HhUv8x3UIfAOugQecJsVH1ajrBC+S18b\nC2NqTNz04DwizHrPSvbH/kGp3B2GqQWaKgkTu4ECgYAXYUWkXfUuldIo5a4NKuDe\nOn8YOA9khXeZAsA/f0FlLlT2uPKjYtSzmcikBze8DcBrdzcBQatuCszuWCXeh+4n\nHue29vGgqRal0kUzkbb41q8hRJ6mvF2Twll3iqR5i8/Wp334HHlfd7MwWXcynMf6\nCmyw4QFXIOlRznJ43vQa4w==\n-----END PRIVATE KEY-----\n",
+  "client_email": "meetintegration@seniorconnect-449710.iam.gserviceaccount.com",
+  "client_id": "104692206067554258614",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/meetintegration%40seniorconnect-449710.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
