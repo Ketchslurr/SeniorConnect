@@ -1,12 +1,12 @@
-# # Ignore Google API secrets
-# api/client_secret.json
-# auth/client_secret_*.json
-# api/seniorconnect-449710-bfca9c360e16.json
-# # Ignore node_modules and vendor (if applicable)
-# node_modules/
-# vendor/
+# Ignore Google API secrets
+api/client_secret.json
+auth/client_secret_*.json
+api/seniorconnect-449710-bfca9c360e16.json
+# Ignore node_modules and vendor (if applicable)
+node_modules
+vendor
 
-# # Ignore environment files
-# .env
-# .env.local
-# node_modules
+# Ignore environment files
+.env
+.env.local
+
