@@ -19,7 +19,7 @@ $sql = "SELECT f.*,
            ELSE 'Unknown' 
        END AS author_name
 FROM forum f
-LEFT JOIN seniorCitizen s ON f.roleId = 2 AND f.userId = s.seniorId
+LEFT JOIN seniorcitizen s ON f.roleId = 2 AND f.userId = s.seniorId
 LEFT JOIN healthcareprofessional d ON f.roleId = 3 AND f.userId = d.professionalId
 ORDER BY f.created_at DESC
 LIMIT 25;";
