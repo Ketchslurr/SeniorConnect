@@ -59,6 +59,9 @@
         <a href="../SeniorCitizen/notifications.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
             <span>🔔</span><span>Notifications</span>
         </a>
+        <a href="../SeniorCitizen/billing.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
+            <span>💳</span><span>Billing & Payments</span>
+        </a>
         <a href="#" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
             <span>⚙️</span><span>Settings</span>
         </a>
