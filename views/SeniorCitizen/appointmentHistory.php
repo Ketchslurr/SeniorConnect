@@ -8,16 +8,16 @@ if (!isset($_SESSION['userId'])) {
     exit();
 }
 
-$seniorId = $_SESSION['userId'];
+$seniorId = $_SESSION['seniorId'];
 
 $stmt = $pdo->prepare("SELECT a.appointment_date, a.appointment_time, a.service_name, a.appointment_status, 
                               a.doctor_response, a.meeting_link, p.fname AS doctor_fname, p.lname AS doctor_lname
                        FROM appointment a
-                       JOIN healthcareprofessional p ON a.professionalId = p.userId
-                       WHERE a.seniorId = ?
+                       JOIN healthcareprofessional p ON a.professionalId = p.professionalId
+                       WHERE a.seniorId = :seniorId
                        ORDER BY a.appointment_date DESC");
 
-$stmt->execute([$seniorId]);
+$stmt->execute(['seniorId' => $seniorId]);
 $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -72,9 +72,9 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <td class="p-3 border"><?php echo htmlspecialchars($appointment['service_name']); ?></td>
                                 <td class="p-3 border"><?php echo htmlspecialchars($appointment['doctor_fname'] . ' ' . $appointment['doctor_lname']); ?></td>
                                 <td class="p-3 border">
-                                    <?php if ($appointment['appointment_status'] == 'completed'): ?>
-                                        <span class="text-green-500 font-semibold">Completed</span>
-                                    <?php elseif ($appointment['appointment_status'] == 'pending'): ?>
+                                    <?php if ($appointment['appointment_status'] == 'Confirmed'): ?>
+                                        <span class="text-green-500 font-semibold">Confirmed</span>
+                                    <?php elseif ($appointment['appointment_status'] == 'Pending'): ?>
                                         <span class="text-yellow-500 font-semibold">Pending</span>
                                     <?php else: ?>
                                         <span class="text-red-500 font-semibold">Canceled</span>
