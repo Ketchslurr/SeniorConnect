@@ -60,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['payment_proof'])) {
                     ':totalAmount' => $totalAmount,
                     ':payment_proof' => $fileName
                 ]);
-                echo "<script>showSuccessModal();</script>";
+                echo "<script>localStorage.setItem('showSuccessModal', 'true');</script>";
                 $uploadSuccess = true;
             } catch (PDOException $e) {
                 echo "<script>alert('Database error: " . $e->getMessage() . "');</script>";
@@ -82,17 +82,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['payment_proof'])) {
     <title>GCash Payment</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script>
-        function closeModal() {
-            document.getElementById('successModal').classList.add('hidden');
-        }
+        document.addEventListener("DOMContentLoaded", function () {
+            if (localStorage.getItem("showSuccessModal") === "true") {
+                showSuccessModal();
+                localStorage.removeItem("showSuccessModal"); // Remove flag after showing modal
+            }
+        });
 
         function showSuccessModal() {
-            document.getElementById('successModal').classList.remove('hidden');
+            document.getElementById("successModal").classList.remove("hidden");
             setTimeout(() => {
-                window.location.href = 'seniorCitizenDashboard.php';
+                window.location.href = "seniorCitizenDashboard.php";
             }, 10000);
         }
+
+        function closeModal() {
+            document.getElementById("successModal").classList.add("hidden");
+        }
     </script>
+
 </head>
 <body class="bg-gray-100 ">
 

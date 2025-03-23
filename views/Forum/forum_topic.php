@@ -57,10 +57,14 @@ $replies = $stmt->fetchAll(PDO::FETCH_ASSOC);
             include '../../includes/healthcareProfessionalSidebar.php'; // Healthcare Professional Sidebar
         }
         ?>
-
+        <div class="mb-4">
+            <button onclick="window.history.back()" class="bg-blue-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-gray-700">
+                ← Back
+            </button>
+        </div>
         <main class="flex-1 p-6">
             <h2 class="text-3xl font-bold"><?= htmlspecialchars($topic['title']) ?></h2>
-            <p class="text-gray-600">By <?= htmlspecialchars($topic['author_name']) ?> 
+            <p class="text-gray-600">By <?= htmlspecialchars($topic['author_name']?? '') ?> 
                 (<?= $topic['roleId'] == 2 ? 'Senior' : 'Doctor' ?>) on <?= htmlspecialchars($topic['created_at']) ?>
             </p>
 
