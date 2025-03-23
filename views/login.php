@@ -14,6 +14,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
+    // First, check if the user is an admin
+    $stmt = $pdo->prepare("SELECT * FROM admin WHERE username = ?");
+    $stmt->execute([$email]);
+    $admin = $stmt->fetch();
+
+    if ($admin && password_verify($password, $admin["password"])) {
+        // Admin login successful
+        $_SESSION["adminId"] = $admin["adminId"];
+        $_SESSION["role"] = 1; // Set roleId to 1 for admin
+        header("Location: ../views/Admin/adminDashboard.php");
+        exit();
+    }
+
+    // If not admin, check user_info table
     $stmt = $pdo->prepare("SELECT ui.userId, ui.Username, ui.fname, ui.Age, ui.email, ui.pwd, ui.roleId, 
                                 hp.professionalId, hp.doctorEmail, sc.seniorId, sc.seniorEmail
                             FROM user_info ui 
@@ -31,18 +45,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['age'] = $user['Age'];
         $_SESSION['valid'] = $user['email'];
         $_SESSION['role'] = $user['roleId'];
-        
-        // if ($user['roleId'] == 3) {
-        //     $_SESSION['professionalId'] = $user['professionalId'];
-        // }
-        // else if ($user['roleId'] == 2) {
-        //     $_SESSION['seniorId'] = $user['seniorId'];
-        // }
+
         // Redirect based on role
         switch ($user['roleId']) {
-            case 1:
-                header("Location: ../views/Admin/adminDashboard.php");
-                break;
             case 2:
                 $_SESSION['seniorId'] = $user['seniorId'];
                 header("Location: ../views/SeniorCitizen/seniorCitizenDashboard.php");
@@ -65,6 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 // Google Login URL
 $googleAuthUrl = $client->createAuthUrl();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">

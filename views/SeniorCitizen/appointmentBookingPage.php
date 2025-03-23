@@ -207,6 +207,7 @@ $services = $stmtServices->fetchAll(PDO::FETCH_ASSOC);
                     if (bookedSet.has(timeText)) {
                         slot.classList.add("bg-gray-400", "cursor-not-allowed", "text-white");
                         slot.disabled = true;
+                        
                     } else {
                         slot.classList.add("bg-white", "text-black", "hover:bg-blue-200");
                         slot.addEventListener("click", function () {
