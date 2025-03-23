@@ -1,5 +1,4 @@
 <?php
-ob_start();
 include '../config.php';
 session_start();
 require '../vendor/autoload.php';
@@ -55,5 +54,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 // Google Login URL
 $googleAuthUrl = $client->createAuthUrl();
-ob_end_flush();
 ?>
