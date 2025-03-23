@@ -102,7 +102,42 @@ $services = $stmtServices->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </main>
     </div>
-
+<!-- Modal -->
+<div id="confirmationModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 hidden">
+    <div class="bg-white rounded-lg p-6 w-96 shadow-lg">
+        <h2 class="text-xl font-bold mb-4">Confirm Appointment</h2>
+        <p><strong>Service:</strong> <span id="modalService"></span></p>
+        <p><strong>Date:</strong> <span id="modalDate"></span></p>
+        <p><strong>Time:</strong> <span id="modalTime"></span></p>
+        <div class="mt-4 flex justify-end">
+            <button id="closeModal" class="px-4 py-2 bg-gray-400 text-white rounded-md mr-2">Cancel</button>
+            <button id="finalConfirm" class="px-4 py-2 bg-blue-600 text-white rounded-md">Confirm</button>
+        </div>
+    </div>
+</div>
+<!-- Success Modal -->
+<div id="successModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden">
+    <div class="bg-white p-6 rounded-lg shadow-lg max-w-md text-center">
+        <h2 class="text-xl font-bold mb-4 text-blue-600">Appointment Confirmed!</h2>
+        <p>Your appointment has been successfully booked.</p>
+        <div class="flex justify-center mt-4">
+            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg" id="closeSuccessModal">OK</button>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div id="confirmationModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 hidden">
+    <div class="bg-white rounded-lg p-6 w-96 shadow-lg">
+        <h2 class="text-xl font-bold mb-4">Confirm Appointment</h2>
+        <p><strong>Service:</strong> <span id="modalService"></span></p>
+        <p><strong>Date:</strong> <span id="modalDate"></span></p>
+        <p><strong>Time:</strong> <span id="modalTime"></span></p>
+        <div class="mt-4 flex justify-end">
+            <button id="closeModal" class="px-4 py-2 bg-gray-400 text-white rounded-md mr-2">Cancel</button>
+            <button id="finalConfirm" class="px-4 py-2 bg-blue-600 text-white rounded-md">Confirm</button>
+        </div>
+    </div>
+</div>
     <script>
 
       
@@ -159,23 +194,29 @@ $services = $stmtServices->fetchAll(PDO::FETCH_ASSOC);
         .then(bookedSlots => {
             console.log("Booked Slots:", bookedSlots); // Debugging
 
+            // Convert booked slots to a Set for faster lookup
+            const bookedSet = new Set(bookedSlots.map(slot => slot.trim()));
+
             formattedTimes.forEach(timeText => {
-                const slot = document.createElement("button");
-                slot.textContent = timeText;
-                slot.classList.add("p-2", "border", "rounded", "text-center", "cursor-pointer", "hover:bg-blue-100", "m-1");
+                if (!document.querySelector(`#timeSlots button[data-time='${timeText}']`)) {
+                    const slot = document.createElement("button");
+                    slot.textContent = timeText;
+                    slot.setAttribute("data-time", timeText);
+                    slot.classList.add("p-2", "border", "rounded", "text-center", "cursor-pointer", "hover:bg-blue-100", "m-1");
 
-                if (bookedSlots.includes(timeText)) {
-                    slot.classList.add("bg-gray-400", "cursor-not-allowed", "text-white");
-                    slot.disabled = true;
-                } else {
-                    slot.classList.add("bg-white", "text-black", "hover:bg-blue-200");
-                    slot.addEventListener("click", function () {
-                        document.querySelectorAll("#timeSlots button").forEach(btn => btn.classList.remove("bg-blue-500", "text-white"));
-                        this.classList.add("bg-blue-500", "text-white");
-                    });
+                    if (bookedSet.has(timeText)) {
+                        slot.classList.add("bg-gray-400", "cursor-not-allowed", "text-white");
+                        slot.disabled = true;
+                    } else {
+                        slot.classList.add("bg-white", "text-black", "hover:bg-blue-200");
+                        slot.addEventListener("click", function () {
+                            document.querySelectorAll("#timeSlots button").forEach(btn => btn.classList.remove("bg-blue-500", "text-white"));
+                            this.classList.add("bg-blue-500", "text-white");
+                        });
+                    }
+
+                    timeSlots.appendChild(slot);
                 }
-
-                timeSlots.appendChild(slot);
             });
         })
         .catch(error => console.error("Error fetching slots:", error));
@@ -185,25 +226,46 @@ $services = $stmtServices->fetchAll(PDO::FETCH_ASSOC);
 
 
 
-      //confirm appointment
+      
+      // Confirm appointment
 document.getElementById("confirmAppointment").addEventListener("click", function () {
     const selectedService = document.querySelector(".service-btn.selected")?.getAttribute("data-service");
     const selectedDate = document.getElementById("appointmentDate").value;
     const selectedTime = document.querySelector("#timeSlots button.bg-blue-500")?.textContent;
-    const professionalId = <?= json_encode($professionalId) ?>; // Get professionalId from PHP
 
-    if (!selectedService || !selectedDate || !selectedTime) {
+    if (!selectedService) {
         alert("Please select a service.");
         return;
     }
     if (!selectedDate) {
-        alert("Please select date.");
+        alert("Please select a date.");
         return;
     }
-    if ( !selectedTime) {
-        alert("Please select time.");
+    if (!selectedTime) {
+        alert("Please select a time.");
         return;
     }
+
+    // Fill modal with selected data
+    document.getElementById("modalService").textContent = selectedService;
+    document.getElementById("modalDate").textContent = selectedDate;
+    document.getElementById("modalTime").textContent = selectedTime;
+
+    // Show the confirmation modal
+    document.getElementById("confirmationModal").classList.remove("hidden");
+});
+
+// Close modal
+document.getElementById("closeModal").addEventListener("click", function () {
+    document.getElementById("confirmationModal").classList.add("hidden");
+});
+
+// Final confirm action
+document.getElementById("finalConfirm").addEventListener("click", function () {
+    const selectedService = document.getElementById("modalService").textContent;
+    const selectedDate = document.getElementById("modalDate").textContent;
+    const selectedTime = document.getElementById("modalTime").textContent;
+    const professionalId = <?= json_encode($professionalId) ?>;
 
     fetch("../../includes/bookAppointmentHandler.php", {
         method: "POST",
@@ -217,15 +279,29 @@ document.getElementById("confirmAppointment").addEventListener("click", function
     })
     .then(response => response.json())
     .then(data => {
-        alert(data.message);
         if (data.status === "success") {
-            // window.location.href = "appointments.php"; // Redirect to appointment list
-            window.location.href = `payment.php?professionalId=${professionalId}&service=${encodeURIComponent(selectedService)}&date=${selectedDate}&time=${encodeURIComponent(selectedTime)}`;
+            // Hide the confirmation modal
+            document.getElementById("confirmationModal").classList.add("hidden");
 
+            // Show the success modal
+            document.getElementById("successModal").classList.remove("hidden");
+        } else {
+            alert(data.message); // Show error message if booking fails
         }
     })
     .catch(error => console.error("Error:", error));
 });
+
+// Close Success Modal & Redirect to Payment Page
+document.getElementById("closeSuccessModal").addEventListener("click", function () {
+    const selectedService = document.getElementById("modalService").textContent;
+    const selectedDate = document.getElementById("modalDate").textContent;
+    const selectedTime = document.getElementById("modalTime").textContent;
+    const professionalId = <?= json_encode($professionalId) ?>;
+
+    window.location.href = `payment.php?professionalId=${professionalId}&service=${encodeURIComponent(selectedService)}&date=${selectedDate}&time=${encodeURIComponent(selectedTime)}`;
+});
+
 
 </script>
 

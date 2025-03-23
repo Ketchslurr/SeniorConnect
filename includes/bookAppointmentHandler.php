@@ -1,51 +1,65 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 include '../config.php';
 session_start();
 
+// Ensure this script only processes POST requests
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode(['status' => 'error', 'message' => 'Invalid request method']);
+    exit();
+}
+
+// Ensure JSON response format
+header("Content-Type: application/json");
+
+// Validate session
 if (!isset($_SESSION['userId'])) {
     echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
     exit();
 }
 
-$seniorCitizenId = $_SESSION['seniorId'];  // Assuming userId is the senior citizen's ID
-$professionalId = isset($_POST['professionalId']) ? intval($_POST['professionalId']) : 0;
-$serviceName = isset($_POST['service_name']) ? trim($_POST['service_name']) : '';
-$appointmentDate = isset($_POST['appointment_date']) ? $_POST['appointment_date'] : '';
-$appointmentTime = isset($_POST['appointment_time']) ? $_POST['appointment_time'] : '';
+// Fetch input values safely
+$seniorCitizenId = $_SESSION['seniorId'] ?? null;
+$professionalId = $_POST['professionalId'] ?? 0;
+$serviceName = trim($_POST['service_name'] ?? '');
+$appointmentDate = $_POST['appointment_date'] ?? '';
+$appointmentTime = $_POST['appointment_time'] ?? '';
 
-if ($professionalId === 0 || empty($serviceName) || empty($appointmentDate) || empty($appointmentTime)) {
+$formatted_time = date("H:i:s", strtotime($appointmentTime));
+
+// Validate required fields
+if (!$seniorCitizenId || !$professionalId || empty($serviceName) || empty($appointmentDate) || empty($appointmentTime)) {
     echo json_encode(['status' => 'error', 'message' => 'All fields are required']);
     exit();
 }
 
-// Check if the same senior has already booked this time slot for the same service and doctor
+// Check if the appointment already exists
 $checkSql = "SELECT COUNT(*) FROM appointment WHERE seniorId = ? AND professionalId = ? AND service_name = ? AND appointment_date = ? AND appointment_time = ?";
 $checkStmt = $pdo->prepare($checkSql);
-$checkStmt->execute([$seniorCitizenId, $professionalId, $serviceName, $appointmentDate, $appointmentTime]);
+$checkStmt->execute([$seniorCitizenId, $professionalId, $serviceName, $appointmentDate, $formatted_time]);
 $alreadyBooked = $checkStmt->fetchColumn();
 
 if ($alreadyBooked) {
     echo json_encode(['status' => 'error', 'message' => 'You have already booked this appointment.']);
     exit();
 }
-// // Check if the selected time slot is already booked
-// $checkSql = "SELECT COUNT(*) FROM appointment WHERE professionalId = ? AND appointment_date = ? AND appointment_time = ?";
-// $checkStmt = $pdo->prepare($checkSql);
-// $checkStmt->execute([$professionalId, $appointmentDate, $appointmentTime]);
-// $alreadyBooked = $checkStmt->fetchColumn();
 
-// if ($alreadyBooked) {
-//     echo json_encode(['status' => 'error', 'message' => 'This time slot is already booked.']);
-//     exit();
-// }
-
-// Insert appointment
+// Insert the new appointment
 $sql = "INSERT INTO appointment (seniorId, professionalId, service_name, appointment_date, appointment_time) 
         VALUES (?, ?, ?, ?, ?)";
 $stmt = $pdo->prepare($sql);
 
-if ($stmt->execute([$seniorCitizenId, $professionalId, $serviceName, $appointmentDate, $appointmentTime])) {
-    echo json_encode(['status' => 'success', 'message' => 'Appointment booked successfully']);
+if ($stmt->execute([$seniorCitizenId, $professionalId, $serviceName, $appointmentDate, $formatted_time])) {
+    echo json_encode([
+        'status' => 'success',
+        'message' => 'Appointment booked successfully',
+        'script' => '<script>
+            document.getElementById("confirmationModal").classList.add("hidden");
+            document.getElementById("successModal").classList.remove("hidden");
+        </script>'
+    ]);
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Database error. Please try again.']);
 }

@@ -18,8 +18,18 @@ if (!$professionalId || !$service || !$date || !$time) {
     exit();
 }
 
-$gcashNumber = "09912166297"; // Replace with actual GCash number
-$qrCodePath = "../../assets/qr.jpg"; // Replace with actual QR image path
+// Fetch doctor's name and service price from the database
+$stmt = $pdo->prepare("SELECT CONCAT(hp.fName, ' ', hp.lName) AS doctor_name, s.price FROM healthcareprofessional hp 
+                       JOIN services s ON s.professionalId = hp.professionalId 
+                       WHERE hp.professionalId = :professionalId AND s.service_name = :service");
+$stmt->execute([':professionalId' => $professionalId, ':service' => $service]);
+$doctor = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$doctorName = $doctor['doctor_name'] ?? "Unknown Doctor";
+$totalAmount = $doctor['price'] ?? "0.00";
+
+$gcashNumber = "09912166297"; 
+$qrCodePath = "../../assets/qr.jpg"; 
 
 $uploadSuccess = false;
 
@@ -39,20 +49,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['payment_proof'])) {
             $userId = $_SESSION['userId'];
 
             try {
-                $stmt = $pdo->prepare("INSERT INTO payments (user_id, professional_id, service, appointment_date, appointment_time, payment_proof, status) 
-                                       VALUES (:userId, :professionalId, :service, :appointment_date, :appointment_time, :payment_proof, 'Pending')");
+                $stmt = $pdo->prepare("INSERT INTO payments (user_id, professional_id, service, appointment_date, appointment_time, payment_proof, total_amount, status) 
+                                       VALUES (:userId, :professionalId, :service, :appointment_date, :appointment_time, :payment_proof, :totalAmount, 'Pending')");
                 $stmt->execute([
                     ':userId' => $userId,
                     ':professionalId' => $professionalId,
                     ':service' => $service,
                     ':appointment_date' => $date,
                     ':appointment_time' => $time,
-                    ':payment_proof' => $fileName
+                    ':payment_proof' => $fileName,
+                    ':totalAmount' => $totalAmount
                 ]);
 
-                // Redirect with a success flag in the URL
-                header("Location: " . $_SERVER['PHP_SELF'] . "?success=true&professionalId=$professionalId&service=$service&date=$date&time=$time");
-                exit();
+                
+                $uploadSuccess = true;
             } catch (PDOException $e) {
                 echo "<script>alert('Database error: " . $e->getMessage() . "');</script>";
             }
@@ -74,17 +84,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['payment_proof'])) {
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     
     <script>
-        function closeModal() {
-            document.getElementById('successModal').classList.add('hidden');
-        }
+         function closeModal() {
+        document.getElementById('successModal').classList.add('hidden');
+    }
 
-        // Show the modal if success is detected in the URL
-        window.onload = function () {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('success')) {
-                document.getElementById('successModal').classList.remove('hidden');
-            }
-        }
+    function showSuccessModal() {
+        document.getElementById('successModal').classList.remove('hidden');
+        setTimeout(() => {
+            window.location.href = 'seniorCitizenDashboard.php';
+        }, 2000); // Redirect after 2 seconds
+    }
     </script>
 </head>
 <body class="bg-gray-100">
@@ -97,11 +106,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['payment_proof'])) {
         <p class="text-gray-600 mb-4">Scan the QR code using GCash to send your payment.</p>
 
         <h3 class="text-xl font-semibold mt-4">Appointment Details</h3>
+        <p><strong>Doctor:</strong> <?= htmlspecialchars($doctorName); ?></p>
         <p><strong>Service:</strong> <?= htmlspecialchars($service); ?></p>
         <p><strong>Date:</strong> <?= htmlspecialchars($date); ?></p>
         <p><strong>Time:</strong> <?= htmlspecialchars($time); ?></p>
+        <p class="text-xl font-semibold mt-2">Total Amount: <span class="text-green-600">₱<?= htmlspecialchars(number_format($totalAmount, 2)); ?></span></p>
 
-        <form action="" method="POST" enctype="multipart/form-data" class="space-y-4 mt-4">
+        <form action="" method="POST" enctype="multipart/form-data" class="space-y-4 mt-4" onsubmit="showSuccessModal()">
             <label class="block">
                 <span class="text-gray-700">Upload Payment Proof:</span>
                 <input type="file" name="payment_proof" required class="block w-full border p-2 rounded">
@@ -112,13 +123,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['payment_proof'])) {
         </form>
     </div>
 
-    <!-- Success Modal -->
+    <!-- ✅ Success Modal -->
     <div id="successModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
         <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-            <h2 class="text-xl font-bold text-green-600">Payment Proof Uploaded Successfully!</h2>
+            <h2 class="text-xl font-bold text-blue-600">Payment Proof Uploaded Successfully!</h2>
             <p class="text-gray-700 mt-2">Please wait for verification.</p>
             <div class="mt-4">
-                <button onclick="window.location.href='dashboard.php'" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">
+                <button onclick="window.location.href='seniorCitizenDashboard.php'" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">
                     Go to Dashboard
                 </button>
                 <button onclick="closeModal()" class="ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700">
