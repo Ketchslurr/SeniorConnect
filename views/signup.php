@@ -27,8 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt = $pdo->prepare("INSERT INTO user_info (fname, lname, age, gender, email, username, pwd, roleId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         if ($stmt->execute([$firstName, $lastName, $age, $gender, $email, $username, $passwordHash, $roleId])) {
             $userId = $pdo->lastInsertId(); // Get the last inserted userId
-
-            // Insert into healthcareprofessional table if roleId is 3
+        
             if ($roleId == 3) {
                 $stmt = $pdo->prepare("INSERT INTO healthcareprofessional (userId, fname, lname, age, gender, doctorEmail) VALUES (?, ?, ?, ?, ?, ?)");
                 $stmt->execute([$userId, $firstName, $lastName, $age, $gender, $email]);
@@ -37,10 +36,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $stmt = $pdo->prepare("INSERT INTO seniorcitizen (userId, fname, lname, age, gender, seniorEmail) VALUES (?, ?, ?, ?, ?, ?)");
                 $stmt->execute([$userId, $firstName, $lastName, $age, $gender, $email]);
             }
-
+        
             unset($_SESSION['roleId']); // Clear role selection after signup
-            header("Location: login.php");
+        
+            $_SESSION['success'] = true; // Set success flag
+            header("Location: signup.php"); // Reload the page to trigger modal
             exit();
+                
         } else {
             $error = "Signup failed. Try again.";
         }
@@ -99,5 +101,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             class="w-full max-w-xl mx-auto">
         </div>
     </div>
+    <?php if (isset($_SESSION['success']) && $_SESSION['success'] === true): ?>
+        <div id="successModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div class="bg-white rounded-lg shadow-lg p-6 w-96 text-center">
+                <h3 class="text-lg font-bold text-green-600">Account Created Successfully!</h3>
+                <p class="text-gray-700 mt-2">Your account has been successfully created. You can now log in.</p>
+                <button onclick="closeModal()" class="mt-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">OK</button>
+            </div>
+        </div>
+        <script>
+            function closeModal() {
+                document.getElementById('successModal').style.display = 'none';
+                window.location.href = "login.php"; // Redirect to login page
+            }
+        </script>
+        <?php unset($_SESSION['success']); // Remove the success flag after showing the modal ?>
+    <?php endif; ?>
+
 </body>
 </html>

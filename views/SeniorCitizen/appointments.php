@@ -53,6 +53,12 @@ foreach ($appointments as $row) {
 
         <main class="flex-1 p-6 flex flex-col items-center">
             <h3 class="text-3xl font-bold mb-6 text-center">Your Appointments Calendar</h3>
+               <!-- View Appointment History Button -->
+               <div class="w-full max-w-4xl flex justify-start mb-4">
+                    <a href="appointmentHistory.php" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
+                        View Appointment History
+                    </a>
+                </div>
             <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-4xl">
                 <div id="calendar"></div>
             </div>

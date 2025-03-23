@@ -13,7 +13,7 @@
 
     // Fetch profile picture if not already in session
     if (!isset($_SESSION['profile_picture'])) {
-        $sql = "SELECT profile_picture FROM seniorCitizen WHERE seniorId = :seniorId";
+        $sql = "SELECT profile_picture FROM seniorcitizen WHERE seniorId = :seniorId";
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['seniorId' => $seniorId]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -37,9 +37,19 @@
         <a href="../SeniorCitizen/seniorCitizenDashboard.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
             <span>🏠</span><span>Dashboard</span>
         </a>
-        <a href="../SeniorCitizen/appointments.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
-            <span>📅</span><span>Appointments</span>
-        </a>
+
+        <!-- Appointments Dropdown -->
+        <div>
+            <button onclick="toggleDropdown()" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500 w-full text-left">
+                <span>📅</span><span>Appointments</span>
+                <span id="arrow" class="ml-auto transition-transform">&#9662;</span>
+            </button>
+            <div id="appointmentsDropdown" class="hidden ml-6 space-y-2 mt-2">
+                <a href="../SeniorCitizen/appointments.php" class="block text-gray-600 hover:text-blue-500">📌 Appointments</a>
+                <a href="../SeniorCitizen/appointmentHistory.php" class="block text-gray-600 hover:text-blue-500">📜 Appointment History</a>
+            </div>
+        </div>
+
         <a href="../SeniorCitizen/telehealth.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
             <span>💻</span><span>Telehealth</span>
         </a>
@@ -54,3 +64,18 @@
         </a>
     </nav>
 </aside>
+
+<script>
+function toggleDropdown() {
+    var dropdown = document.getElementById("appointmentsDropdown");
+    var arrow = document.getElementById("arrow");
+
+    if (dropdown.classList.contains("hidden")) {
+        dropdown.classList.remove("hidden");
+        arrow.style.transform = "rotate(180deg)";
+    } else {
+        dropdown.classList.add("hidden");
+        arrow.style.transform = "rotate(0deg)";
+    }
+}
+</script>
