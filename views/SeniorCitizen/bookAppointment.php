@@ -57,7 +57,7 @@ $services = $stmtServices->fetchAll(PDO::FETCH_ASSOC);
                     <img src="<?= !empty($doctor['profile_picture']) ? 'data:image/jpeg;base64,' . base64_encode($doctor['profile_picture']) : '../../assets/Images/default-profile.png' ?>" class="w-24 h-24 rounded-full border" />
                     <div>
                         <p class="text-xl font-semibold"><?= htmlspecialchars($doctor['fname'] . ' ' . $doctor['lname']) ?></p>
-                        <p class="text-gray-600"><?= htmlspecialchars($doctor['specialization']) ?></p>
+                        <p class="text-gray-600"><?= htmlspecialchars($doctor['specialization']?? 'Nothing to display') ?></p>
                     </div>
                 </div>
                 

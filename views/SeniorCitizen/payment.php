@@ -60,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['payment_proof'])) {
                     ':totalAmount' => $totalAmount,
                     ':payment_proof' => $fileName
                 ]);
-                
+                echo "<script>showSuccessModal();</script>";
                 $uploadSuccess = true;
             } catch (PDOException $e) {
                 echo "<script>alert('Database error: " . $e->getMessage() . "');</script>";
