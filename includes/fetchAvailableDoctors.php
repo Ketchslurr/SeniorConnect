@@ -41,7 +41,7 @@ $doctors = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <img src="../../assets/Images/default-doctor.png" class="w-24 h-24 rounded-full border mb-4" />
                             <?php endif; ?>
                             <h3 class="text-xl font-semibold"> <?= htmlspecialchars($doctor['fname'] . ' ' . $doctor['lname']) ?> </h3>
-                            <p class="text-gray-600 mb-4"> <?= htmlspecialchars($doctor['specialization']) ?> </p>
+                            <p class="text-gray-600 mb-4"> <?= htmlspecialchars($doctor['specialization'] ?? 'Nothing to display') ?> </p>
                             <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition" 
                                 onclick="window.location.href='bookAppointment.php?professionalId=<?= $doctor['professionalId'] ?>'">
                                 Book an Appointment

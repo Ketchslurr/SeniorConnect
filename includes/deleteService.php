@@ -1,17 +1,14 @@
 <?php
-include '../config.php';
 session_start();
-
+include '../config.php';
 if (!isset($_SESSION['userId'])) {
     header("Location: ../login.php");
     exit();
 }
-
 // Check if the request is a POST request
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $serviceId = $_POST['serviceId'];
     $professionalId = $_SESSION['professionalId'];
-echo "console.log('Service ID: ', $serviceId);";
     try {
         // Verify that the service belongs to the logged-in user
         $checkQuery = "SELECT * FROM services WHERE serviceId = :serviceId AND professionalId = :professionalId";
@@ -36,7 +33,6 @@ echo "console.log('Service ID: ', $serviceId);";
     echo "error";
     $_SESSION['error'] = "Invalid request.";
 }
-echo "<script>alert('Service added successfully!');</script>";
 // Redirect back to the services management page
 header("Location: ../views/healthcareProfessional/services.php?success=Service deleted successfully");
 exit();

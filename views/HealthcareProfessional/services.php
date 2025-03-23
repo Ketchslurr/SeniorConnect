@@ -100,9 +100,9 @@ $isAvailable = $doctorAvailability ? $doctorAvailability['is_available'] : 0;
                     <?php foreach ($services as $service) { ?>
                         <li class="border p-4 rounded-lg flex justify-between flex-col md:flex-row">
                             <div>
-                                <p class="text-xl font-semibold"><?= htmlspecialchars($service['service_name']) ?></p>
-                                <p class="text-gray-600"><?= htmlspecialchars($service['description']) ?></p>
-                                <p class="text-blue-600">₱<?= htmlspecialchars($service['price']) ?></p>
+                                <p class="text-xl font-semibold"><?= htmlspecialchars($service['service_name'] ?? '') ?></p>
+                                <p class="text-gray-600"><?= htmlspecialchars($service['description']?? '') ?></p>
+                                <p class="text-blue-600">₱<?= htmlspecialchars($service['price'] ?? '') ?></p>
                             </div>
                             <div class="flex space-x-2 mt-2 md:mt-0">
                                 <button class="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700" onclick="editService(<?= $service['serviceId'] ?>, '<?= htmlspecialchars($service['service_name']) ?>', '<?= htmlspecialchars($service['description']) ?>', <?= $service['price'] ?>)">
@@ -172,7 +172,7 @@ $isAvailable = $doctorAvailability ? $doctorAvailability['is_available'] : 0;
                 </div>
                 <div class="mb-4">
                     <label class="block text-gray-700">Specialization</label>
-                    <input type="text" name="specialization" value="<?= htmlspecialchars($professional['specialization']) ?>" class="w-full p-2 border rounded" required>
+                    <input type="text" name="specialization" value="<?= htmlspecialchars($professional['specialization']?? 'No Specialization') ?>" class="w-full p-2 border rounded" required>
                 </div>
                 <div class="mb-4">
                     <label class="block text-gray-700">Age</label>

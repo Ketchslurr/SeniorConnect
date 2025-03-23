@@ -15,7 +15,7 @@ $sql = "SELECT f.title,
                f.created_at, 
                f.roleId
         FROM forum f 
-        LEFT JOIN seniorCitizen s ON f.roleId = 2 AND f.userId = s.seniorId
+        LEFT JOIN seniorcitizen s ON f.roleId = 2 AND f.userId = s.seniorId
         LEFT JOIN healthcareprofessional d ON f.roleId = 3 AND f.userId = d.professionalId
         WHERE f.forumId = :topicId";
 
@@ -28,7 +28,7 @@ $sql = "SELECT r.message, r.created_at,
                IF(r.roleId = 2, s.fname, d.fname) AS author_name, 
                r.roleId
         FROM forum_replies r 
-        LEFT JOIN seniorCitizen s ON r.roleId = 2 AND r.userId = s.seniorId
+        LEFT JOIN seniorcitizen s ON r.roleId = 2 AND r.userId = s.seniorId
         LEFT JOIN healthcareprofessional d ON r.roleId = 3 AND r.userId = d.professionalId
         WHERE r.topicId = :topicId 
         ORDER BY r.created_at ASC";

@@ -10,7 +10,7 @@ if (!isset($_SESSION['userId'])) {
 $seniorId = $_SESSION['seniorId'];
 
 // Fetch current senior details
-$sql = "SELECT * FROM seniorCitizen WHERE seniorId = :seniorId";
+$sql = "SELECT * FROM seniorcitizen WHERE seniorId = :seniorId";
 $stmt = $pdo->prepare($sql);
 $stmt->execute(['seniorId' => $seniorId]);
 $senior = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Prepare SQL query
     if ($profilePictureExists) {
-        $sql = "UPDATE seniorCitizen SET 
+        $sql = "UPDATE seniorcitizen SET 
                     fName = :fName, 
                     lName = :lName, 
                     age = :age, 
@@ -62,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             'seniorId' => $seniorId
         ];
     } else {
-        $sql = "UPDATE seniorCitizen SET 
+        $sql = "UPDATE seniorcitizen SET 
                     fName = :fName, 
                     lName = :lName, 
                     age = :age, 

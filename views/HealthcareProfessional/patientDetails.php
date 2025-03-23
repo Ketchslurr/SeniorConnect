@@ -15,7 +15,7 @@ if (!isset($_GET['seniorId'])) {
 $seniorId = $_GET['seniorId'];
 
 // Fetch patient details
-$sql = "SELECT * FROM seniorCitizen WHERE seniorId = :seniorId";
+$sql = "SELECT * FROM seniorcitizen WHERE seniorId = :seniorId";
 $stmt = $pdo->prepare($sql);
 $stmt->execute(['seniorId' => $seniorId]);
 $patient = $stmt->fetch(PDO::FETCH_ASSOC);
