@@ -25,9 +25,11 @@ function createNotification($pdo, $seniorId, $message) {
 }
 
 // Fetch appointments booked with the doctor
-$sql = "SELECT a.*, s.fname AS senior_name 
+$sql = "SELECT a.*, s.fname AS senior_name, 
+               p.status, p.receipt
         FROM appointment a
         JOIN seniorcitizen s ON a.seniorId = s.seniorId
+        LEFT JOIN payments p ON a.seniorId = p.seniorId
         WHERE a.professionalId = :professionalId
         ORDER BY a.appointment_date ASC";
 
@@ -113,6 +115,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId']) && is
                             <th class="py-3 px-4">Date</th>
                             <th class="py-3 px-4">Time</th>
                             <th class="py-3 px-4">Status</th>
+                            <th class="py-3 px-4">Payment Status</th>
+                            <th class="py-3 px-4">Receipt</th>
                             <th class="py-3 px-4 text-center">Actions</th>
                         </tr>
                     </thead>
@@ -130,6 +134,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId']) && is
                                     <span class="text-red-600 font-bold">Cancelled</span>
                                 <?php else: ?>
                                     <span class="text-black-600 font-bold">Pending</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="py-3 px-4 text-center">
+                                <?php if (!empty($appointment['receipt'])): ?>
+                                    <a href="<?= htmlspecialchars($appointment['receipt']) ?>" target="_blank" class="text-blue-500 underline">View Receipt</a>
+                                <?php else: ?>
+                                    <span class="text-gray-500">No Receipt</span>
                                 <?php endif; ?>
                             </td>
 
@@ -228,44 +239,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId']) && is
 </script>
 
 
-    <!-- <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                locale: 'en',
-                height: 'auto',
-                events: <?= json_encode($events) ?>,
-            });
-            calendar.render();
-        });
-
-        function confirmAppointment(id) {
-            fetch('../../includes/confirmAppointment.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'appointmentId=' + id
-            }).then(() => location.reload());
-        }
-
-        function showDenyModal(id) {
-            document.getElementById('denyModal').classList.remove('hidden');
-            document.getElementById('denyModal').dataset.appointmentId = id;
-        }
-
-        function submitDeny() {
-            var id = document.getElementById('denyModal').dataset.appointmentId;
-            var message = document.getElementById('denyMessage').value;
-            fetch('../../includes/denyAppointment.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'appointmentId=' + id + '&message=' + encodeURIComponent(message)
-            }).then(() => location.reload());
-        }
-
-        function closeDenyModal() {
-            document.getElementById('denyModal').classList.add('hidden');
-        }
-    </script> -->
 </body>
 </html>
