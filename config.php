@@ -1,5 +1,4 @@
 <?php
-session_start();
 $host = "mainline.proxy.rlwy.net";
 $port = "11430";
 $dbname = "senior_connect";
