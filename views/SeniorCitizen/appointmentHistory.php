@@ -80,7 +80,7 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <span class="text-red-500 font-semibold">Canceled</span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="p-3 border"><?php echo htmlspecialchars($appointment['doctor_response']); ?></td>
+                                <td class="p-3 border"><?php echo htmlspecialchars($appointment['doctor_response']?? ''); ?></td>
                                 <td class="p-3 border">
                                     <?php if (!empty($appointment['meeting_link'])): ?>
                                         <a href="<?php echo htmlspecialchars($appointment['meeting_link']); ?>" 

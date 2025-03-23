@@ -15,7 +15,7 @@ $seniorId = $_SESSION['seniorId'];
 $sql = "SELECT f.*, 
        CASE 
            WHEN f.roleId = 2 THEN CONCAT(s.fName, ' ', s.lName) 
-           WHEN f.roleId = 3 THEN CONCAT(d.fName, ' ', d.lName) 
+           WHEN f.roleId = 3 THEN CONCAT(d.fname, ' ', d.lname) 
            ELSE 'Unknown' 
        END AS author_name
 FROM forum f
@@ -68,7 +68,7 @@ $topics = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <a href="SeniorCitizen/forum_topic.php?id=<?= $topic['forumId'] ?>" class="text-blue-500 font-semibold hover:underline">
                                         <?= htmlspecialchars($topic['title']) ?>
                                     </a>
-                                    <p class="text-sm text-gray-600">By <?= htmlspecialchars($topic['author_name']) ?> 
+                                    <p class="text-sm text-gray-600">By <?= htmlspecialchars($topic['author_name'] ?? '') ?> 
                                         (<?= $topic['roleId'] == 2 ? 'Senior' : 'Doctor' ?>) 
                                         on <?= htmlspecialchars($topic['created_at']) ?>
                                     </p>
