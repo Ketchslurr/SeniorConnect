@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $stmt->execute([$userId, $firstName, $lastName, $age, $gender, $email]);
             }
         
-            unset($_SESSION['roleId']); // Clear role selection after signup
+            // unset($_SESSION['roleId']); // Clear role selection after signup
         
             $_SESSION['success'] = true; // Set success flag
             header("Location: signup.php"); // Reload the page to trigger modal
