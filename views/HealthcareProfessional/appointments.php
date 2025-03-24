@@ -26,7 +26,7 @@ function createNotification($pdo, $seniorId, $message) {
 
 // Fetch appointments booked with the doctor
 $sql = "SELECT a.*, s.fname AS senior_name, 
-               p.status, p.receipt
+               p.status, p.receipt, p.paymentId
         FROM appointment a
         JOIN seniorcitizen s ON a.seniorId = s.seniorId
         LEFT JOIN payments p ON a.seniorId = p.seniorId
@@ -137,6 +137,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId']) && is
                                 <?php endif; ?>
                             </td>
                             <td class="py-3 px-4 text-center">
+                                <?php if ($appointment['status'] == 'verified'): ?>
+                                    <span class="text-green-600 font-bold">Paid</span>
+                                <?php elseif ($appointment['status'] == 'unverified'): ?>
+                                    <span class="text-red-600 font-bold">Unpaid</span>
+                                <?php else: ?>
+                                    <span class="text-yellow-600 font-bold">Pending</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="py-3 px-4 text-center">
                                 <?php if (!empty($appointment['receipt'])): ?>
                                     <a href="#" onclick="openModal('<?= htmlspecialchars($appointment['receipt']) ?>')" class="text-blue-500 underline">
                                         View Receipt
@@ -147,7 +156,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId']) && is
                             </td>
                             <td class="py-3 px-4 text-center">
                                 <?php if ($appointment['appointment_status'] == 'Pending'): ?>
-                                    <button onclick="openConfirmModal(<?= $appointment['appointmentId'] ?>)" 
+                                    <button onclick="openConfirmModal(<?= $appointment['appointmentId'] ?>, <?= $appointment['paymentId'] ?>)" 
                                         class="text-blue-500 text-xl mx-2 cursor-pointer" 
                                         title="Confirm Appointment">
                                             ✔️
@@ -186,19 +195,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId']) && is
 
     <!-- Confirm Modal -->
     
-    <div id="confirmModal" class="fixed inset-0 hidden bg-gray-900 bg-opacity-50 flex justify-center items-center">
+        <div id="confirmModal" class="fixed inset-0 hidden bg-gray-900 bg-opacity-50 flex justify-center items-center">
         <div class="bg-white p-6 rounded-lg shadow-lg w-96">
             <h3 class="text-xl font-bold mb-4">Confirm Appointment</h3>
             <p>Are you sure you want to confirm this appointment?</p>
             <form id="confirmForm" method="POST" action="../../includes/confirmAppointment.php">
                 <input type="hidden" name="appointmentId" id="confirmAppointmentId">
+                <input type="hidden" name="paymentId" id="confirmPaymentId">  <!-- New Hidden Field for Payment ID -->
                 <div class="flex justify-center space-x-4 mt-4">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Confirm</button>
-                    <button type="button" onclick="closeConfirmModal()" class="px-4 py-2 bg-gray-600 text-white rounded">Cancel</button>
+                    <button type="submit" onclick="console.log('Submitting form with:', document.getElementById('confirmAppointmentId').value, document.getElementById('confirmPaymentId').value)" 
+                            class="px-4 py-2 bg-blue-600 text-white rounded">
+                        Confirm
+                    </button>
+                    <button type="button" onclick="closeConfirmModal()" class="px-4 py-2 bg-gray-600 text-white rounded">
+                        Cancel
+                    </button>
                 </div>
             </form>
         </div>
     </div>
+
 
 
 
@@ -248,13 +264,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId']) && is
         calendar.render();
     });
 
-    function openConfirmModal(appointmentId) {
-        document.getElementById('confirmAppointmentId').value = appointmentId;
-        document.getElementById('confirmModal').classList.remove('hidden');
+    function openConfirmModal(appointmentId, paymentId) {
+        console.log("Opening Confirm Modal for:", "Appointment ID:", appointmentId, "Payment ID:", paymentId);
+        document.getElementById("confirmAppointmentId").value = appointmentId;
+        document.getElementById("confirmPaymentId").value = paymentId; // Set Payment ID
+        document.getElementById("confirmModal").classList.remove("hidden");
     }
 
     function closeConfirmModal() {
-        document.getElementById('confirmModal').classList.add('hidden');
+        document.getElementById("confirmModal").classList.add("hidden");
     }
 
     function openDenyModal(appointmentId) {

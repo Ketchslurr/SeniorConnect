@@ -61,7 +61,7 @@ $transactions = $billingStmt->fetchAll(PDO::FETCH_ASSOC);
                                         <td class="p-3"><?php echo htmlspecialchars($transaction['service_name']); ?></td>
                                         <td class="p-3">₱<?php echo number_format($transaction['amount'], 2); ?></td>
                                         <td class="p-3">
-                                            <?php if ($transaction['status'] == 'Pending'): ?>
+                                            <?php if ($transaction['status'] == 'unverified'): ?>
                                                 <a href="payment.php?paymentId=<?php echo $transaction['paymentId']; ?>" 
                                                    class="text-yellow-500 font-semibold hover:underline">
                                                     Pay Now

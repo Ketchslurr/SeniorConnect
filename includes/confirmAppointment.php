@@ -7,16 +7,31 @@ if (!isset($_SESSION['userId'])) {
     exit();
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId'])) {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId']) && isset($_POST['paymentId'])) {
     $appointmentId = $_POST['appointmentId'];
+    $paymentId = $_POST['paymentId'];
 
-    $sql = "UPDATE appointment SET appointment_status = 'Confirmed' WHERE appointmentId = :appointmentId";
-    $stmt = $pdo->prepare($sql);
-    
-    if ($stmt->execute(['appointmentId' => $appointmentId])) {
-        $_SESSION['success'] = "Appointment confirmed successfully.";
-    } else {
-        $_SESSION['error'] = "Failed to confirm the appointment.";
+    try {
+        // Start transaction
+        $pdo->beginTransaction();
+
+        // Update appointment status
+        $sql1 = "UPDATE appointment SET appointment_status = 'Confirmed' WHERE appointmentId = :appointmentId";
+        $stmt1 = $pdo->prepare($sql1);
+        $stmt1->execute(['appointmentId' => $appointmentId]);
+
+        // Update payment status to Verified
+        $sql2 = "UPDATE payments SET status = 'Verified' WHERE paymentId = :paymentId";
+        $stmt2 = $pdo->prepare($sql2);
+        $stmt2->execute(['paymentId' => $paymentId]);
+
+        // Commit transaction
+        $pdo->commit();
+
+        $_SESSION['success'] = "Appointment confirmed and payment status updated successfully.";
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        $_SESSION['error'] = "Failed to confirm appointment: " . $e->getMessage();
     }
 }
 
