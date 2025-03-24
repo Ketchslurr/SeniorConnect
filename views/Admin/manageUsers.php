@@ -54,8 +54,8 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <?= ($user['roleId'] == 2) ? 'Senior' : 'Doctor'; ?>
                             </td>
                             <td class="p-3">
-                                <a href="edit_user.php?id=<?= $user['userId']; ?>" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-700">Edit</a>
-                                <a href="delete_user.php?id=<?= $user['userId']; ?>" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700" onclick="return confirm('Are you sure?')">Delete</a>
+                                <a href="editUser.php?id=<?= $user['userId']; ?>" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-700">Edit</a>
+                                <a href="deleteUser.php?id=<?= $user['userId']; ?>" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700" onclick="return confirm('Are you sure?')">Delete</a>
                             </td>
                         </tr>
                     <?php endforeach; ?>
