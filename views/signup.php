@@ -20,34 +20,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['pwd'];
     $confirmPass = $_POST['confirm_pwd'];
 
+    // Check if passwords match
     if ($password !== $confirmPass) {
         $error = "Passwords do not match!";
     } else {
-        $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("INSERT INTO user_info (fname, lname, age, gender, email, username, pwd, roleId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        if ($stmt->execute([$firstName, $lastName, $age, $gender, $email, $username, $passwordHash, $roleId])) {
-            $userId = $pdo->lastInsertId(); // Get the last inserted userId
-        
-            if ($roleId == 3) {
-                $stmt = $pdo->prepare("INSERT INTO healthcareprofessional (userId, fname, lname, age, gender, doctorEmail) VALUES (?, ?, ?, ?, ?, ?)");
-                $stmt->execute([$userId, $firstName, $lastName, $age, $gender, $email]);
-            }
-            if ($roleId == 2) {
-                $stmt = $pdo->prepare("INSERT INTO seniorcitizen (userId, fname, lname, age, gender, seniorEmail) VALUES (?, ?, ?, ?, ?, ?)");
-                $stmt->execute([$userId, $firstName, $lastName, $age, $gender, $email]);
-            }
-        
-            // unset($_SESSION['roleId']); // Clear role selection after signup
-        
-            $_SESSION['success'] = true; // Set success flag
-            header("Location: signup.php"); // Reload the page to trigger modal
-            exit();
-                
+        // Check if email already exists
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM user_info WHERE email = ?");
+        $stmt->execute([$email]);
+        $emailExists = $stmt->fetchColumn();
+
+        if ($emailExists > 0) {
+            $error = "Email is already registered. Please use a different email.";
         } else {
-            $error = "Signup failed. Try again.";
+            $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare("INSERT INTO user_info (fname, lname, age, gender, email, username, pwd, roleId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            if ($stmt->execute([$firstName, $lastName, $age, $gender, $email, $username, $passwordHash, $roleId])) {
+                $userId = $pdo->lastInsertId(); // Get the last inserted userId
+
+                if ($roleId == 3) {
+                    $stmt = $pdo->prepare("INSERT INTO healthcareprofessional (userId, fname, lname, age, gender, doctorEmail) VALUES (?, ?, ?, ?, ?, ?)");
+                    $stmt->execute([$userId, $firstName, $lastName, $age, $gender, $email]);
+                }
+                if ($roleId == 2) {
+                    $stmt = $pdo->prepare("INSERT INTO seniorcitizen (userId, fname, lname, age, gender, seniorEmail) VALUES (?, ?, ?, ?, ?, ?)");
+                    $stmt->execute([$userId, $firstName, $lastName, $age, $gender, $email]);
+                }
+
+                $_SESSION['success'] = true; // Set success flag
+                header("Location: signup.php"); // Reload the page to trigger modal
+                exit();
+            } else {
+                $error = "Signup failed. Try again.";
+            }
         }
     }
 }
+
 ?>
 
 <!DOCTYPE html>
