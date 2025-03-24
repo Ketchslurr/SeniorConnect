@@ -1,7 +1,6 @@
 <aside class="w-64 bg-white shadow-lg p-6 min-h-screen">
     <?php
     include '../../config.php'; 
-    // session_start();
 
     // Ensure user is logged in
     if (!isset($_SESSION['seniorId'])) {
@@ -40,9 +39,9 @@
 
         <!-- Appointments Dropdown -->
         <div>
-            <button onclick="toggleDropdown()" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500 w-full text-left">
+            <button onclick="toggleDropdown('appointmentsDropdown', 'arrowAppointments')" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500 w-full text-left">
                 <span>📅</span><span>Appointments</span>
-                <span id="arrow" class="ml-auto transition-transform">&#9662;</span>
+                <span id="arrowAppointments" class="ml-auto transition-transform">&#9662;</span>
             </button>
             <div id="appointmentsDropdown" class="hidden ml-6 space-y-2 mt-2">
                 <a href="../SeniorCitizen/appointments.php" class="block text-gray-600 hover:text-blue-500">📌 Appointments</a>
@@ -62,6 +61,19 @@
         <a href="../SeniorCitizen/billing.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
             <span>💳</span><span>Billing & Payments</span>
         </a>
+
+        <!-- Senior Fitness Dropdown -->
+        <div>
+            <button onclick="toggleDropdown('fitnessDropdown', 'arrowFitness')" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500 w-full text-left">
+                <span>🏋️</span><span>Senior Fitness</span>
+                <span id="arrowFitness" class="ml-auto transition-transform">&#9662;</span>
+            </button>
+            <div id="fitnessDropdown" class="hidden ml-6 space-y-2 mt-2">
+                <a href="../SeniorCitizen/seniorFitness.php" class="block text-gray-600 hover:text-blue-500">🏋️ Browse</a>
+                <a href="../SeniorCitizen/library.php" class="block text-gray-600 hover:text-blue-500">🎥 Purchased Videos</a>
+            </div>
+        </div>
+
         <a href="#" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
             <span>⚙️</span><span>Settings</span>
         </a>
@@ -69,9 +81,9 @@
 </aside>
 
 <script>
-function toggleDropdown() {
-    var dropdown = document.getElementById("appointmentsDropdown");
-    var arrow = document.getElementById("arrow");
+function toggleDropdown(dropdownId, arrowId) {
+    var dropdown = document.getElementById(dropdownId);
+    var arrow = document.getElementById(arrowId);
 
     if (dropdown.classList.contains("hidden")) {
         dropdown.classList.remove("hidden");
