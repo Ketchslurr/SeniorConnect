@@ -54,7 +54,7 @@ $purchasedClasses = $stmtPurchased->fetchAll(PDO::FETCH_COLUMN);
                             <h3 class="text-lg font-semibold"><?= htmlspecialchars($class['title']) ?></h3>
                             <p class="text-gray-600 text-sm"><?= htmlspecialchars($class['description']) ?></p>
                             <p class="text-blue-600 font-semibold mt-2">
-                                <?= $class['price'] == 0 ? "Free" : "$" . $class['price'] ?>
+                                <?= $class['price'] == 0 ? "Free" : "₱" . $class['price'] ?>
                             </p>
 
                             <div class="mt-4">
