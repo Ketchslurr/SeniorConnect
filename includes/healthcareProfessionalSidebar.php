@@ -12,6 +12,9 @@
         <a href="../HealthcareProfessional/appointments.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
             <span>📅</span><span>Appointments</span>
         </a>
+        <a href="../HealthcareProfessional/doctorsPayment.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
+            <span>📊</span><span>Uploaded Payments</span>
+        </a>
         <a href="../HealthcareProfessional/patients.php#" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
             <span>🧑</span><span>Patients</span>
         </a>

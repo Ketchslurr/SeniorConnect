@@ -10,7 +10,7 @@ if (!isset($_SESSION['userId'])) {
 }
 
 // Capture appointment details from URL
-$seniorId = $_SESSION['userId']; // Assuming the logged-in user is a senior
+$seniorId = $_SESSION['seniorId']; // Assuming the logged-in user is a senior
 $professionalId = $_GET['professionalId'] ?? null;
 $service = $_GET['service'] ?? null;
 $date = $_GET['date'] ?? null;

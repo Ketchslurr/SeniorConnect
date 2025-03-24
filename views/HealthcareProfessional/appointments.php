@@ -138,12 +138,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId']) && is
                             </td>
                             <td class="py-3 px-4 text-center">
                                 <?php if (!empty($appointment['receipt'])): ?>
-                                    <a href="<?= htmlspecialchars($appointment['receipt']) ?>" target="_blank" class="text-blue-500 underline">View Receipt</a>
+                                    <a href="#" onclick="openModal('<?= htmlspecialchars($appointment['receipt']) ?>')" class="text-blue-500 underline">
+                                        View Receipt
+                                    </a>
                                 <?php else: ?>
                                     <span class="text-gray-500">No Receipt</span>
                                 <?php endif; ?>
                             </td>
-
                             <td class="py-3 px-4 text-center">
                                 <?php if ($appointment['appointment_status'] == 'Pending'): ?>
                                     <button onclick="openConfirmModal(<?= $appointment['appointmentId'] ?>)" 
@@ -172,6 +173,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId']) && is
                 <div id="calendar"></div>
             </div>
         </main>
+    </div>
+
+    <!-- Receipt Modal  -->
+    <div id="receiptModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg relative">
+            <span class="absolute top-2 right-4 text-2xl cursor-pointer" onclick="closeModal()">&times;</span>
+            <h2 class="text-xl font-bold text-center mb-4">Payment Receipt</h2>
+            <img id="receiptImage" src="" alt="Receipt" class="w-full rounded-lg">
+        </div>
     </div>
 
     <!-- Confirm Modal -->
@@ -207,6 +217,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId']) && is
             </form>
         </div>
     </div>
+    <script>
+    function openModal(receiptPath) {
+        const modal = document.getElementById('receiptModal');
+        const img = document.getElementById('receiptImage');
+        img.src = "../../assets/uploads/payments/" + receiptPath; 
+        modal.classList.remove('hidden');
+
+        // Close modal when clicking outside the image
+        modal.addEventListener("click", function(event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+    }
+
+    function closeModal() {
+        document.getElementById('receiptModal').classList.add('hidden');
+    }
+</script>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         var calendarEl = document.getElementById('calendar');
