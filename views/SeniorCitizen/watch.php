@@ -8,7 +8,7 @@ if (!isset($_SESSION['seniorId'])) {
 }
 
 if (!isset($_GET['fitnessId'])) {
-    header("Location: senior_fitness.php");
+    header("Location: seniorFitness.php");
     exit();
 }
 
@@ -25,7 +25,7 @@ $class = $stmt->fetch();
 
 if (!$class) {
     $_SESSION['error'] = "You haven't purchased this class.";
-    header("Location: senior_fitness.php");
+    header("Location: seniorFitness.php");
     exit();
 }
 ?>
