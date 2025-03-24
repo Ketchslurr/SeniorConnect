@@ -106,75 +106,104 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId']) && is
             
             <!-- List View -->
             <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-                <h4 class="text-xl font-bold mb-4">Appointment List</h4>
-                <table class="w-full border-collapse bg-white shadow-md rounded-lg overflow-hidden">
-                    <thead>
-                        <tr class="bg-blue-500 text-white">
-                            <th class="py-3 px-4">Senior Name</th>
-                            <th class="py-3 px-4">Service</th>
-                            <th class="py-3 px-4">Date</th>
-                            <th class="py-3 px-4">Time</th>
-                            <th class="py-3 px-4">Status</th>
-                            <th class="py-3 px-4">Payment Status</th>
-                            <th class="py-3 px-4">Receipt</th>
-                            <th class="py-3 px-4 text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($appointments as $appointment) : ?>
-                            <tr class="border-b">
-                                <td class="py-3 px-4 text-center"><?= htmlspecialchars($appointment['senior_name']) ?></td>
-                                <td class="py-3 px-4 text-center"><?= htmlspecialchars($appointment['service_name']) ?></td>
-                                <td class="py-3 px-4 text-center"><?= htmlspecialchars($appointment['appointment_date']) ?></td>
-                                <td class="py-3 px-4 text-center"><?= htmlspecialchars($appointment['appointment_time']) ?></td>
-                                <td class="py-3 px-4 text-center">
-                                <?php if ($appointment['appointment_status'] == 'Confirmed'): ?>
-                                    <span class="text-blue-600 font-bold">Confirmed</span>
-                                <?php elseif ($appointment['appointment_status'] == 'Cancelled'): ?>
-                                    <span class="text-red-600 font-bold">Cancelled</span>
-                                <?php else: ?>
-                                    <span class="text-black-600 font-bold">Pending</span>
-                                <?php endif; ?>
-                            </td>
-                            <td class="py-3 px-4 text-center">
-                                <?php if ($appointment['status'] == 'verified'): ?>
-                                    <span class="text-green-600 font-bold">Paid</span>
-                                <?php elseif ($appointment['status'] == 'unverified'): ?>
-                                    <span class="text-red-600 font-bold">Unpaid</span>
-                                <?php else: ?>
-                                    <span class="text-yellow-600 font-bold">Pending</span>
-                                <?php endif; ?>
-                            </td>
-                            <td class="py-3 px-4 text-center">
-                                <?php if (!empty($appointment['receipt'])): ?>
-                                    <a href="#" onclick="openModal('<?= htmlspecialchars($appointment['receipt']) ?>')" class="text-blue-500 underline">
-                                        View Receipt
-                                    </a>
-                                <?php else: ?>
-                                    <span class="text-gray-500">No Receipt</span>
-                                <?php endif; ?>
-                            </td>
-                            <td class="py-3 px-4 text-center">
-                                <?php if ($appointment['appointment_status'] == 'Pending'): ?>
-                                    <button onclick="openConfirmModal(<?= $appointment['appointmentId'] ?>, <?= $appointment['paymentId'] ?>)" 
-                                        class="text-blue-500 text-xl mx-2 cursor-pointer" 
-                                        title="Confirm Appointment">
-                                            ✔️
-                                    </button>
-                                    <button onclick="openDenyModal(<?= $appointment['appointmentId'] ?>)" 
-                                        class="text-red-500 text-xl mx-2 cursor-pointer" 
-                                        title="Deny Appointment">
-                                            ❌
-                                    </button>
-                                <?php endif; ?>
-                            </td>
+    <h4 class="text-xl font-bold mb-4">Appointment List</h4>
 
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+    <!-- Filters -->
+    <div class="flex flex-wrap mb-4 gap-4">
+        <input type="text" id="searchInput" placeholder="Search..." class="border p-2 rounded w-1/4">
+        
+        <select id="statusFilter" class="border p-2 rounded">
+            <option value="">All Status</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Cancelled">Cancelled</option>
+            <option value="Pending">Pending</option>
+        </select>
 
-            </div>
+        <select id="paymentFilter" class="border p-2 rounded">
+            <option value="">All Payment Status</option>
+            <option value="verified">Paid</option>
+            <option value="unverified">Unpaid</option>
+            <option value="pending">Pending</option>
+        </select>
+
+        <input type="date" id="startDate" class="border p-2 rounded">
+        <input type="date" id="endDate" class="border p-2 rounded">
+    </div>
+
+    <!-- Scrollable Table -->
+    <div class="overflow-y-auto max-h-96 border rounded-lg">
+        <table class="w-full border-collapse bg-white shadow-md rounded-lg overflow-hidden">
+            <thead class="sticky top-0 bg-blue-500 text-white">
+                <tr>
+                    <th class="py-3 px-4">Senior Name</th>
+                    <th class="py-3 px-4">Service</th>
+                    <th class="py-3 px-4">Date</th>
+                    <th class="py-3 px-4">Time</th>
+                    <th class="py-3 px-4">Status</th>
+                    <th class="py-3 px-4">Payment Status</th>
+                    <th class="py-3 px-4">Receipt</th>
+                    <th class="py-3 px-4 text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="appointmentTableBody">
+                <?php foreach ($appointments as $appointment) : ?>
+                    <tr class="border-b appointment-row" 
+                        data-status="<?= $appointment['appointment_status'] ?>" 
+                        data-payment="<?= $appointment['status'] ?>"
+                        data-date="<?= $appointment['appointment_date'] ?>"
+                        data-name="<?= htmlspecialchars($appointment['senior_name']) ?>">
+                        <td class="py-3 px-4 text-center"><?= htmlspecialchars($appointment['senior_name']) ?></td>
+                        <td class="py-3 px-4 text-center"><?= htmlspecialchars($appointment['service_name']) ?></td>
+                        <td class="py-3 px-4 text-center"><?= htmlspecialchars($appointment['appointment_date']) ?></td>
+                        <td class="py-3 px-4 text-center"><?= htmlspecialchars($appointment['appointment_time']) ?></td>
+                        <td class="py-3 px-4 text-center">
+                            <?php if ($appointment['appointment_status'] == 'Confirmed'): ?>
+                                <span class="text-blue-600 font-bold">Confirmed</span>
+                            <?php elseif ($appointment['appointment_status'] == 'Cancelled'): ?>
+                                <span class="text-red-600 font-bold">Cancelled</span>
+                            <?php else: ?>
+                                <span class="text-black-600 font-bold">Pending</span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <?php if ($appointment['status'] == 'verified'): ?>
+                                <span class="text-green-600 font-bold">Paid</span>
+                            <?php elseif ($appointment['status'] == 'unverified'): ?>
+                                <span class="text-red-600 font-bold">Unpaid</span>
+                            <?php else: ?>
+                                <span class="text-yellow-600 font-bold">Pending</span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <?php if (!empty($appointment['receipt'])): ?>
+                                <a href="#" onclick="openModal('<?= htmlspecialchars($appointment['receipt']) ?>')" class="text-blue-500 underline">
+                                    View Receipt
+                                </a>
+                            <?php else: ?>
+                                <span class="text-gray-500">No Receipt</span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <?php if ($appointment['appointment_status'] == 'Pending'): ?>
+                                <button onclick="openConfirmModal(<?= $appointment['appointmentId'] ?>, <?= $appointment['paymentId'] ?>)" 
+                                    class="text-blue-500 text-xl mx-2 cursor-pointer" 
+                                    title="Confirm Appointment">
+                                        ✔️
+                                </button>
+                                <button onclick="openDenyModal(<?= $appointment['appointmentId'] ?>)" 
+                                    class="text-red-500 text-xl mx-2 cursor-pointer" 
+                                    title="Deny Appointment">
+                                        ❌
+                                </button>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
 
             <!-- Calendar View -->
             <div class="bg-white p-6 rounded-lg shadow-md">
@@ -285,6 +314,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId']) && is
     }
 </script>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("searchInput");
+        const statusFilter = document.getElementById("statusFilter");
+        const paymentFilter = document.getElementById("paymentFilter");
+        const startDate = document.getElementById("startDate");
+        const endDate = document.getElementById("endDate");
+        const tableBody = document.getElementById("appointmentTableBody");
+        const rows = document.querySelectorAll(".appointment-row");
+
+        function filterAppointments() {
+            const searchText = searchInput.value.toLowerCase();
+            const selectedStatus = statusFilter.value;
+            const selectedPayment = paymentFilter.value;
+            const start = startDate.value ? new Date(startDate.value) : null;
+            const end = endDate.value ? new Date(endDate.value) : null;
+
+            rows.forEach(row => {
+                const name = row.getAttribute("data-name").toLowerCase();
+                const status = row.getAttribute("data-status");
+                const payment = row.getAttribute("data-payment");
+                const date = new Date(row.getAttribute("data-date"));
+
+                let matchesSearch = name.includes(searchText);
+                let matchesStatus = selectedStatus === "" || status === selectedStatus;
+                let matchesPayment = selectedPayment === "" || payment === selectedPayment;
+                let matchesDate = (!start || date >= start) && (!end || date <= end);
+
+                row.style.display = (matchesSearch && matchesStatus && matchesPayment && matchesDate) ? "" : "none";
+            });
+        }
+
+        searchInput.addEventListener("input", filterAppointments);
+        statusFilter.addEventListener("change", filterAppointments);
+        paymentFilter.addEventListener("change", filterAppointments);
+        startDate.addEventListener("change", filterAppointments);
+        endDate.addEventListener("change", filterAppointments);
+    });
+</script>
 
 </body>
 </html>

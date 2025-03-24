@@ -24,12 +24,13 @@ if (!$user) {
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $fullname = $_POST['fullname'];
+    $fName = $_POST['fName'];
+    $lName = $_POST['lName'];
     $email = $_POST['email'];
     $roleId = $_POST['roleId'];
 
-    $updateStmt = $pdo->prepare("UPDATE user_info SET fullname = ?, email = ?, roleId = ? WHERE userId = ?");
-    $updateStmt->execute([$fullname, $email, $roleId, $userId]);
+    $updateStmt = $pdo->prepare("UPDATE user_info SET fName = ?, lName = ?, email = ?, roleId = ? WHERE userId = ?");
+    $updateStmt->execute([$fName, $lName, $email, $roleId, $userId]);
 
     header("Location: manage_users.php");
     exit();
@@ -42,11 +43,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <h2 class="text-2xl font-bold text-blue-600">Edit User</h2>
 
     <form method="POST" class="bg-white p-4 shadow-md rounded-md">
-        <label class="block font-semibold">Full Name:</label>
-        <input type="text" name="fullname" value="<?= $user['fullname'] ?>" required class="p-2 border rounded-md w-full">
+        <label class="block font-semibold">First Name:</label>
+        <input type="text" name="fName" value="<?= htmlspecialchars($user['fName']) ?>" required class="p-2 border rounded-md w-full">
+
+        <label class="block font-semibold mt-3">Last Name:</label>
+        <input type="text" name="lName" value="<?= htmlspecialchars($user['lName']) ?>" required class="p-2 border rounded-md w-full">
 
         <label class="block font-semibold mt-3">Email:</label>
-        <input type="email" name="email" value="<?= $user['email'] ?>" required class="p-2 border rounded-md w-full">
+        <input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required class="p-2 border rounded-md w-full">
 
         <label class="block font-semibold mt-3">Role:</label>
         <select name="roleId" class="p-2 border rounded-md w-full">
