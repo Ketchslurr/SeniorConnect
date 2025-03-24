@@ -14,6 +14,6 @@ if (isset($_GET['id'])) {
     $stmt->execute([$userId]);
 }
 
-header("Location: manage_users.php");
+header("Location: manageUsers.php");
 exit();
 ?>
