@@ -65,7 +65,7 @@ $topics = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         foreach ($topics as $topic) { ?>
                             <li class="border-b pb-2 flex justify-between items-center">
                                 <div>
-                                    <a href="SeniorCitizen/forum_topic.php?id=<?= $topic['forumId'] ?>" class="text-blue-500 font-semibold hover:underline">
+                                    <a href="forum_topic.php?id=<?= $topic['forumId'] ?>" class="text-blue-500 font-semibold hover:underline">
                                         <?= htmlspecialchars($topic['title']) ?>
                                     </a>
                                     <p class="text-sm text-gray-600">By <?= htmlspecialchars($topic['author_name'] ?? '') ?> 

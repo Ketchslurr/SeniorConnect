@@ -26,12 +26,12 @@ if (!$user) {
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $fName = $_POST['fName'];
-    $lName = $_POST['lName'];
+    $lname = $_POST['lname'];
     $email = $_POST['email'];
     $roleId = $_POST['roleId'];
 
-    $updateStmt = $pdo->prepare("UPDATE user_info SET fName = ?, lName = ?, email = ?, roleId = ? WHERE userId = ?");
-    $updateStmt->execute([$fName, $lName, $email, $roleId, $userId]);
+    $updateStmt = $pdo->prepare("UPDATE user_info SET fName = ?, lname = ?, email = ?, roleId = ? WHERE userId = ?");
+    $updateStmt->execute([$fName, $lname, $email, $roleId, $userId]);
 
     $_SESSION['success'] = "User details updated successfully.";
     header("Location: manageUsers.php");
@@ -49,25 +49,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </head>
 <body class="bg-gray-100">
 
-    <!-- ✅ Include Topbar -->
+    <!--  Include Topbar -->
     <?php include '../../includes/topbar.php'; ?>
 
     <div class="flex">
-        <!-- ✅ Include Sidebar -->
+        <!--  Include Sidebar -->
         <?php include '../../includes/adminSidebar.php'; ?>
 
         <div class="flex-1 p-6">
             <h1 class="text-2xl font-semibold text-gray-800 mb-6">Edit User</h1>
 
             <div class="bg-white shadow-md rounded-lg p-6">
-                <!-- ✅ Error Message -->
+                <!-- Error Message -->
                 <?php if (isset($_SESSION['error'])) : ?>
                     <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
                         <?= $_SESSION['error']; unset($_SESSION['error']); ?>
                     </div>
                 <?php endif; ?>
 
-                <!-- ✅ Success Message -->
+                <!--  Success Message -->
                 <?php if (isset($_SESSION['success'])) : ?>
                     <div class="bg-green-100 text-green-700 p-3 rounded mb-4">
                         <?= $_SESSION['success']; unset($_SESSION['success']); ?>
@@ -82,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                     <div>
                         <label class="block text-gray-700 font-semibold">Last Name:</label>
-                        <input type="text" name="lName" value="<?= htmlspecialchars($user['lName'] ?? '') ?>" required class="w-full p-2 border rounded-md">
+                        <input type="text" name="lname" value="<?= htmlspecialchars($user['lname'] ?? '') ?>" required class="w-full p-2 border rounded-md">
                     </div>
 
                     <div>

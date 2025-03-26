@@ -11,19 +11,21 @@ if (!isset($_SESSION['seniorId'])) {
 $seniorId = $_SESSION['seniorId'];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['medicalRecord'])) {
-    $uploadDir = "../../uploads/medical_records/";
+    $uploadDir = "../assets/uploads/medical_records/";
     $file = $_FILES['medicalRecord'];
 
     // Validate file type (allow PDF, JPG, PNG)
     $allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
     if (!in_array($file['type'], $allowedTypes)) {
-        echo "Error: Only PDF, JPG, and PNG files are allowed.";
+        $_SESSION['upload_status'] = "Error: Only PDF, JPG, and PNG files are allowed.";
+        $_SESSION['upload_status_type'] = "error";
         exit();
     }
 
     // Validate file size (max 5MB)
     if ($file['size'] > 5 * 1024 * 1024) {
-        echo "Error: File size exceeds 5MB.";
+        $_SESSION['upload_status'] = "Error: File size exceeds 5MB.";
+        $_SESSION['upload_status_type'] = "error";
         exit();
     }
 
@@ -32,18 +34,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['medicalRecord'])) {
     $newFileName = "medical_" . $seniorId . "_" . time() . "." . $fileExtension;
     $filePath = $uploadDir . $newFileName;
 
+    // $uploadDir = "../../uploads/medical_records/";
+    // if (!is_dir($uploadDir)) {
+    //     mkdir($uploadDir, 0777, true); // Create directory if it doesn't exist
+    // }
+
     // Move file to uploads directory
     if (move_uploaded_file($file['tmp_name'], $filePath)) {
         // Save file info to database
-        $sql = "INSERT INTO medical_records (seniorId, file_name, uploaded_at) VALUES (:seniorId, :fileName, NOW())";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['seniorId' => $seniorId, 'fileName' => $newFileName]);
+        $sql = "INSERT INTO medical_records (seniorId, file_name, file_path, uploaded_at) 
+                VALUES (:seniorId, :fileName, :filePath, NOW())";
 
-        echo "Medical record uploaded successfully!";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+                            'seniorId' => $seniorId,
+                            'fileName' => $newFileName,
+                            'filePath' => $filePath 
+                        ]);
+
+        $_SESSION['upload_status'] = "Medical record uploaded successfully!";
+        $_SESSION['upload_status_type'] = "success";
     } else {
-        echo "Error: Failed to upload the file.";
+        $_SESSION['upload_status'] = "Error: Failed to upload the file.";
+        $_SESSION['upload_status_type'] = "error";
     }
 } else {
-    echo "Error: No file uploaded.";
+    $_SESSION['upload_status'] = "Error: No file uploaded.";
+    $_SESSION['upload_status_type'] = "error";
 }
+header("Location: ../views/SeniorCitizen/seniorProfile.php");
+exit();
 ?>

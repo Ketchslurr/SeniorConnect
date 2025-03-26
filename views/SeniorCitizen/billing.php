@@ -61,24 +61,25 @@ $transactions = $billingStmt->fetchAll(PDO::FETCH_ASSOC);
                                         <td class="p-3"><?php echo htmlspecialchars($transaction['service_name']); ?></td>
                                         <td class="p-3">₱<?php echo number_format($transaction['amount'], 2); ?></td>
                                         <td class="p-3">
-                                            <?php if ($transaction['status'] == 'unverified'): ?>
+                                            <?php if (!empty($transaction['receipt']) && file_exists("../../assets/uploads/payments/" . $transaction['receipt'])): ?>
+                                                <span class="text-green-500 font-semibold"> Paid</span>
+                                            <?php elseif ($transaction['status'] == 'unverified'): ?>
                                                 <a href="payment.php?paymentId=<?php echo $transaction['paymentId']; ?>" 
-                                                   class="text-yellow-500 font-semibold hover:underline">
+                                                class="text-yellow-500 font-semibold hover:underline">
                                                     Pay Now
                                                 </a>
                                             <?php else: ?>
-                                                <span class="text-green-500 font-semibold">✅ Paid</span>
+                                                <span class="text-green-500 font-semibold"> Paid</span>
                                             <?php endif; ?>
                                         </td>
                                         <td class="p-3">
-                                            <?php if (!empty($transaction['receipt'])): ?>
-                                                <a href="../../assets/uploads/payments/<?php echo $transaction['receipt']; ?>" 
-                                                   target="_blank" 
-                                                   class="text-blue-500 underline">
-                                                   View Receipt
-                                                </a>
+                                            <?php if (!empty($transaction['receipt']) && file_exists("../../assets/uploads/payments/" . $transaction['receipt'])): ?>
+                                                <button onclick="openModal('<?php echo $transaction['receipt']; ?>')" 
+                                                        class="text-blue-500 underline">
+                                                    View Receipt
+                                                </button>
                                             <?php else: ?>
-                                                <span class="text-gray-500">No receipt uploaded</span>
+                                                <span class="text-red-500">Receipt not found. Please upload again.</span>
                                             <?php endif; ?>
                                         </td>
                                         <td class="p-3 text-gray-500">
@@ -96,5 +97,36 @@ $transactions = $billingStmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 
+    <!-- ✅ Receipt Modal -->
+    <div id="receiptModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4" onclick="closeModal(event)">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-[90vw] max-w-4xl max-h-[90vh] overflow-auto relative" onclick="event.stopPropagation()">
+        <button onclick="closeModal()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+        <h2 class="text-2xl font-semibold mb-4 text-center">Receipt Preview</h2>
+        <div class="flex justify-center">
+            <img id="receiptImage" src="" alt="Receipt" class="max-w-full max-h-[70vh] rounded-lg shadow-md">
+        </div>
+    </div>
+</div>
+
+<script>
+    function openModal(receiptFile) {
+        const modal = document.getElementById("receiptModal");
+        const receiptImage = document.getElementById("receiptImage");
+
+        if (receiptFile) {
+            receiptImage.src = "../../assets/uploads/payments/" + receiptFile;
+        } else {
+            receiptImage.src = "https://via.placeholder.com/500x300?text=Receipt+Not+Found";
+        }
+
+        modal.classList.remove("hidden");
+    }
+
+    function closeModal(event = null) {
+        if (!event || event.target.id === "receiptModal") {
+            document.getElementById("receiptModal").classList.add("hidden");
+        }
+    }
+</script>
 </body>
 </html>

@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // **Check if profile_picture exists in the database**
-    $checkColumnSQL = "SHOW COLUMNS FROM seniorCitizen LIKE 'profile_picture'";
+    $checkColumnSQL = "SHOW COLUMNS FROM seniorcitizen LIKE 'profile_picture'";
     $columnStmt = $pdo->prepare($checkColumnSQL);
     $columnStmt->execute();
     $profilePictureExists = $columnStmt->rowCount() > 0;

@@ -7,7 +7,7 @@ if (!isset($_SESSION["adminId"])) {
 
 require '../../config.php';
 
-$stmt = $pdo->query("SELECT userId, fName, lName, email, roleId FROM user_info ORDER BY roleId DESC");
+$stmt = $pdo->query("SELECT userId, fName, lname, email, roleId FROM user_info ORDER BY roleId DESC");
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -27,6 +27,20 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         <div class="flex-1 p-6">
             <h2 class="text-2xl font-bold text-blue-600 mb-4">Manage Users</h2>
+
+            <!-- Success Message -->
+            <?php if (isset($_SESSION['success'])) : ?>
+                <div class="bg-green-100 text-green-700 p-3 rounded mb-4">
+                    <?= $_SESSION['success']; unset($_SESSION['success']); ?>
+                </div>
+            <?php endif; ?>
+
+            <!-- Error Message -->
+            <?php if (isset($_SESSION['error'])) : ?>
+                <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
+                    <?= $_SESSION['error']; unset($_SESSION['error']); ?>
+                </div>
+            <?php endif; ?>
 
             <!-- Search bar -->
             <input type="text" id="search" placeholder="Search users..." 
@@ -48,7 +62,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php foreach ($users as $user): ?>
                         <tr class="border-b">
                             <td class="p-3"><?= htmlspecialchars($user['userId']); ?></td>
-                            <td class="p-3"><?= htmlspecialchars($user['fName'] .''. $user['lName'] ?? 'N/A'); ?></td>
+                            <td class="p-3"><?= htmlspecialchars($user['fName'] . ' ' . $user['lname'] ?? 'N/A'); ?></td>
                             <td class="p-3"><?= htmlspecialchars($user['email']); ?></td>
                             <td class="p-3 font-semibold <?= ($user['roleId'] == 2) ? 'text-green-600' : 'text-blue-600' ?>">
                                 <?= ($user['roleId'] == 2) ? 'Senior' : 'Doctor'; ?>

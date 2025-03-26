@@ -11,9 +11,12 @@ if (isset($_GET['id'])) {
     $userId = $_GET['id'];
 
     $stmt = $pdo->prepare("DELETE FROM user_info WHERE userId = ?");
-    $stmt->execute([$userId]);
+    if ($stmt->execute([$userId])) {
+        $_SESSION['success'] = "User deleted successfully.";
+    } else {
+        $_SESSION['error'] = "Failed to delete user.";
+    }
 }
 
 header("Location: manageUsers.php");
 exit();
-?>
