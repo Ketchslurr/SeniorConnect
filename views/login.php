@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // If not admin, check user_info table
-    $stmt = $pdo->prepare("SELECT ui.userId, ui.Username, ui.fname, ui.Age, ui.email, ui.pwd, ui.roleId, 
+    $stmt = $pdo->prepare("SELECT ui.userId, ui.fname, ui.Age, ui.email, ui.pwd, ui.roleId, 
                                 hp.professionalId, hp.doctorEmail, sc.seniorId, sc.seniorEmail
                             FROM user_info ui 
                             LEFT JOIN healthcareprofessional hp ON ui.userId = hp.userId 
@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($user && password_verify($password, $user['pwd'])) {
         $_SESSION['userId'] = $user['userId'];
-        $_SESSION['username'] = $user['Username'];
+        // $_SESSION['username'] = $user['Username'];
         $_SESSION['fname'] = $user['fname'];
         $_SESSION['age'] = $user['Age'];
         $_SESSION['valid'] = $user['email'];
