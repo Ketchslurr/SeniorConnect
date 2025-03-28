@@ -50,7 +50,7 @@ $services = $stmtServices->fetchAll(PDO::FETCH_ASSOC);
         
         <main class="flex-1 p-6">
             <a href="telehealth.php" class="text-blue-600 hover:underline">&larr; Back</a>
-            <h2 class="text-3xl font-bold text-center mb-6">Book an Appointment</h2>
+            <h2 class="text-3xl font-bold text-center mb-6">Consultation</h2>
 
             <div class="bg-white p-6 rounded-lg shadow-md max-w-3xl mx-auto">
                 <div class="flex items-center space-x-4">

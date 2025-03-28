@@ -44,7 +44,7 @@ $doctors = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <p class="text-gray-600 mb-4"> <?= htmlspecialchars($doctor['specialization'] ?? 'Nothing to display') ?> </p>
                             <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition" 
                                 onclick="window.location.href='bookAppointment.php?professionalId=<?= $doctor['professionalId'] ?>'">
-                                Book an Appointment
+                                Consult Now!
                             </button>
                         </div>
                     <?php endforeach; ?>

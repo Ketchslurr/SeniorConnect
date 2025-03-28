@@ -13,6 +13,7 @@ $stmt = $pdo->prepare("SELECT p.paymentId, s.service_name, CONCAT(sc.fName, ' ',
                        FROM payments p 
                        JOIN services s ON p.serviceId = s.serviceId 
                        JOIN seniorcitizen sc ON p.seniorId = sc.seniorId
+                       
                        ORDER BY p.paymentDate DESC");
 $stmt->execute();
 $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);

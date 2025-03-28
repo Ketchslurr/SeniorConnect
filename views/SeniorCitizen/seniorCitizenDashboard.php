@@ -67,6 +67,7 @@ foreach ($appointments as $row) {
                                     <div class="border-l-4 border-green-500 bg-green-100 p-4 hover:bg-green-200 transition">
                                         <p><strong>Appointment ID:</strong> <?= htmlspecialchars($row['appointmentId']) ?></p>
                                         <p><strong>Date:</strong> <?= htmlspecialchars($row['appointment_date']) ?></p>
+                                        <p><strong>Time:</strong> <?= htmlspecialchars($row['appointment_time']) ?></p>
                                         <p><strong>Status:</strong> <?= htmlspecialchars($row['appointment_status']) ?></p>
                                     </div>
                                 </a>
