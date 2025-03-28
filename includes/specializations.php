@@ -1,7 +1,7 @@
 <?php
 function getSpecializationDropdown() {
     return '
-    <select name="specialization" class="w-full border p-2 rounded" required>
+    <select name="specialization" class="w-full border p-2 rounded">
         <option value="">Select Specialization</option>
         <option value="Allergist">Allergist</option>
         <option value="Anesthesiologist">Anesthesiologist</option>

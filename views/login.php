@@ -33,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             FROM user_info ui 
                             LEFT JOIN healthcareprofessional hp ON ui.userId = hp.userId 
                             LEFT JOIN seniorcitizen sc ON ui.userId = sc.userId
-                            WHERE ui.email = ?");
+                            WHERE ui.email = ? AND is_verified = 1");
 
     $stmt->execute([$email]);
     $user = $stmt->fetch();

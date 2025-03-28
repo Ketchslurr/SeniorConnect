@@ -1,14 +1,14 @@
 <?php
-session_start(); // Start session to get stored roleId
+session_start();
 include '../config.php';
 include '../includes/specializations.php';
-// Ensure roleId is set, otherwise redirect back to role selection
+
 if (!isset($_SESSION['roleId'])) {
     header("Location: select_role.php");
     exit();
 }
 
-$roleId = $_SESSION['roleId']; // Retrieve stored role
+$roleId = $_SESSION['roleId'];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $firstName = $_POST['fName'];
@@ -16,57 +16,82 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $age = $_POST['age'];
     $gender = $_POST['gender'];
     $email = $_POST['email'];
-    // $username = $_POST['username'];
     $password = $_POST['pwd'];
     $confirmPass = $_POST['confirm_pwd'];
 
-    // Check if passwords match
     if ($password !== $confirmPass) {
         $error = "Passwords do not match!";
     } else {
-        // Check if email already exists
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM user_info WHERE email = ?");
-        $stmt->execute([$email]);
-        $emailExists = $stmt->fetchColumn();
+        // ✅ Step 1: Validate Email Using Abstract API
+        $apiKey = "eaa405e188f24410b1b9c8b87a1a8b4e"; // Replace with your API key
+        $apiUrl = "https://emailvalidation.abstractapi.com/v1/?api_key=$apiKey&email=$email";
+        
+        $response = file_get_contents($apiUrl);
+        $result = json_decode($response, true);
 
-        if ($emailExists > 0) {
-            $error = "Email is already registered. Please use a different email.";
+        // ✅ Step 2: Check if email is valid
+        if ($result['deliverability'] !== 'DELIVERABLE' || $result['is_disposable_email'] === true) {
+            $error = "Invalid or temporary email. Please use a real email.";
         } else {
-            $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("INSERT INTO user_info (fname, lname, age, gender, email, pwd, roleId) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            if ($stmt->execute([$firstName, $lastName, $age, $gender, $email, $passwordHash, $roleId])) {
-                $userId = $pdo->lastInsertId(); // Get the last inserted userId
+            // ✅ Step 3: Check if email is already registered
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM user_info WHERE email = ?");
+            $stmt->execute([$email]);
+            $emailExists = $stmt->fetchColumn();
 
-                if ($roleId == 3) { // Doctor
-                    $birthdate = $_POST['birthdate'];
-                    $doctorLicenseNumber = $_POST['doctorLicenseNumber'];
-                    $specialization = $_POST['specialization'];
-                
-                    // Handle license file upload
-                    $targetDir = "../assets/uploads/licenses/";
-                    $licenseFileName = basename($_FILES["licenseUpload"]["name"]);
-                    $licenseTargetPath = $targetDir . $licenseFileName;
-                    move_uploaded_file($_FILES["licenseUpload"]["tmp_name"], $licenseTargetPath);
-                
-                    $stmt = $pdo->prepare("INSERT INTO healthcareprofessional (userId, fname, lname, age, gender, doctorEmail, birthdate, doctorLicenseNumber, licenseUpload, specialization) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                    $stmt->execute([$userId, $firstName, $lastName, $age, $gender, $email, $birthdate, $doctorLicenseNumber, $licenseFileName, $specialization]);
-                }
-                if ($roleId == 2) {
-                    $stmt = $pdo->prepare("INSERT INTO seniorcitizen (userId, fname, lname, age, gender, seniorEmail) VALUES (?, ?, ?, ?, ?, ?)");
-                    $stmt->execute([$userId, $firstName, $lastName, $age, $gender, $email]);
-                }
-
-                $_SESSION['success'] = true; // Set success flag
-                header("Location: signup.php"); // Reload the page to trigger modal
-                exit();
+            if ($emailExists > 0) {
+                $error = "Email is already registered. Please use a different email.";
             } else {
-                $error = "Signup failed. Try again.";
+                // ✅ Step 4: Generate Verification Code
+                $verificationCode = bin2hex(random_bytes(16));
+                $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+
+                $stmt = $pdo->prepare("INSERT INTO user_info (fname, lname, age, gender, email, pwd, roleId, verification_code, is_verified) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)");
+                
+                if ($stmt->execute([$firstName, $lastName, $age, $gender, $email, $passwordHash, $roleId, $verificationCode])) {
+                    $userId = $pdo->lastInsertId(); // Get last inserted userId
+
+                    if ($roleId == 3) { // If Doctor
+                        $birthdate = $_POST['birthdate'];
+                        $doctorLicenseNumber = $_POST['doctorLicenseNumber'];
+                        $specialization = $_POST['specialization'];
+
+                        // Handle license upload
+                        $targetDir = "../assets/uploads/licenses/";
+                        $licenseFileName = basename($_FILES["licenseUpload"]["name"]);
+                        $licenseTargetPath = $targetDir . $licenseFileName;
+                        move_uploaded_file($_FILES["licenseUpload"]["tmp_name"], $licenseTargetPath);
+
+                        $stmt = $pdo->prepare("INSERT INTO healthcareprofessional (userId, fname, lname, age, gender, doctorEmail, birthdate, doctorLicenseNumber, licenseUpload, specialization) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                        $stmt->execute([$userId, $firstName, $lastName, $age, $gender, $email, $birthdate, $doctorLicenseNumber, $licenseFileName, $specialization]);
+                    }
+                    if ($roleId == 2) { // If Senior Citizen
+                        $stmt = $pdo->prepare("INSERT INTO seniorcitizen (userId, fname, lname, age, gender, seniorEmail) VALUES (?, ?, ?, ?, ?, ?)");
+                        $stmt->execute([$userId, $firstName, $lastName, $age, $gender, $email]);
+                    }
+
+                    // ✅ Step 5: Send Verification Email
+                    $to = $email;
+                    $subject = "Verify Your Email Address";
+                    $message = "Hello $firstName,\n\n";
+                    $message .= "Please verify your email by clicking the link below:\n";
+                    $message .= "http://senior-production-f9d8.up.railway.app/verify_email.php?code=$verificationCode\n\n";
+                    $message .= "Thank you!";
+                    $headers = "From: noreply@yourwebsite.com";
+
+                    mail($to, $subject, $message, $headers);
+
+                    $_SESSION['message'] = "Verification email sent! Please check your inbox.";
+                    header("Location: verify_email.php");
+                    exit();
+                } else {
+                    $error = "Signup failed. Try again.";
+                }
             }
         }
     }
 }
-
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -94,26 +119,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
             <h2 class="text-2xl font-bold text-center">Sign Up</h2>
             <?php if (isset($error)) echo "<p class='text-red-500 text-center mt-2'>$error</p>"; ?>
-            <form method="POST" onsubmit="return validateForm()" enctype="multipart/form-data" class="mt-4 space-y-4">
+            <form method="POST" enctype="multipart/form-data" class="mt-4 space-y-4">
             <div class="flex space-x-4">
                     <input type="text" name="fName" class="w-1/2 border p-2 rounded" placeholder="First Name" required>
                     <input type="text" name="lName" class="w-1/2 border p-2 rounded" placeholder="Last Name" required>
                 </div>
-                <?php echo getSpecializationDropdown(); ?>
-                <input type="date" name="birthdate" class="w-full border p-2 rounded" required>
-                <input type="number" name="age" class="w-full border p-2 rounded" placeholder="Age" required>
+                <input type="date" name="birthdate" id="birthdate" class="w-full border p-2 rounded" required>
+                <input type="number" name="age" id="age" class="w-full border p-2 rounded bg-gray-200" readonly>
+                <p id="age-error" class="text-red-500 text-sm hidden">Only seniors (60 years and older) can register.</p>
+
                 <select name="gender" class="w-full border p-2 rounded" required>
                     <option value="">Select Gender</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                     <option value="other">Other</option>
                 </select>
-                <input type="email" name="email" class="w-full border p-2 rounded" placeholder="Email" required>
-                <input type="password" name="pwd" class="w-full border p-2 rounded" placeholder="Password" required>
-                <input type="password" name="confirm_pwd" class="w-full border p-2 rounded" placeholder="Confirm Password" required>
-                <input type="text" id="doctorLicenseNumber" name="doctorLicenseNumber" class="w-full border p-2 rounded" placeholder="License Number" required>
-                <p id="error-message" class="text-red-500 text-sm hidden">Invalid License Number format. Example: D12-34-567890 or D1234567890</p>
+                <div id="doctorFields" class="hidden">
+                    <?php echo getSpecializationDropdown(); ?>
+                    <input type="text" id="doctorLicenseNumber" name="doctorLicenseNumber" class="w-full border p-2 rounded" placeholder="License Number" >
+                    <p id="error-message" class="text-red-500 text-sm hidden">Invalid License Number format. Example: D12-34-567890 or D1234567890</p>
+                </div>
+                <label for="licenseUpload" class="block" >Upload Valid ID</label>
                 <input type="file" name="licenseUpload" class="w-full border p-2 rounded" accept=".pdf,.jpg,.png" required>
+                <input type="email" name="email" class="w-full border p-2 rounded" placeholder="Email" required>
+                <input type="password" id="pwd" name="pwd" class="w-full border p-2 rounded" placeholder="Password" required>
+                <input type="password" id="confirm_pwd" name="confirm_pwd" class="w-full border p-2 rounded" placeholder="Confirm Password" required>
+                <p id="password-error" class="text-red-500 text-sm hidden">Password must be at least 8 characters long, including an uppercase letter, lowercase letter, number, and special character.</p>
                 <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Sign Up</button>
             </form>
             <p class="text-center text-gray-600 mt-4">Already have an account? <a href="../views/login.php" class="text-blue-500 hover:underline">Login here!</a></p>
@@ -124,53 +155,117 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
     <script>
-        function validateLicense() {
-            let licenseInput = document.getElementById("doctorLicenseNumber").value;
-            let errorMessage = document.getElementById("error-message");
+        let roleId = <?php echo isset($_SESSION['roleId']) ? json_encode($_SESSION['roleId']) : 'null'; ?>;
 
-            // Remove dashes for validation
-            let formattedLicense = licenseInput.replace(/-/g, "");
 
-            // PRC License Number format: A00-00-000000 or A0000000000
-            let regex = /^[A-Za-z]\d{2}\d{2}\d{6}$/;
 
-            if (!regex.test(formattedLicense)) {
-                errorMessage.classList.remove("hidden"); // Show error message
-                return false; // Prevent form submission
-            } else {
-                errorMessage.classList.add("hidden"); // Hide error message
-                return true; // Allow form submission
+        document.addEventListener("DOMContentLoaded", function () {
+            let birthdateInput = document.getElementById("birthdate");
+            let ageInput = document.getElementById("age");
+            let ageError = document.getElementById("age-error");
+            let form = document.querySelector("form");
+
+            birthdateInput.addEventListener("change", function () {
+                let birthdate = new Date(this.value);
+                let today = new Date();
+                let age = today.getFullYear() - birthdate.getFullYear();
+                let monthDiff = today.getMonth() - birthdate.getMonth();
+
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdate.getDate())) {
+                    age--;
+                }
+
+                ageInput.value = age;
+
+                if (age < 60) {
+                    ageError.classList.remove("hidden");
+                } else {
+                    ageError.classList.add("hidden");
+                }
+            });
+
+            form.addEventListener("submit", function (event) {
+                let age = parseInt(ageInput.value);
+                if (age < 60) {
+                    event.preventDefault(); // Stop form submission
+                    ageError.classList.remove("hidden");
+                }
+            });
+        });
+
+
+        function toggleFields() {
+            let doctorFields = document.getElementById("doctorFields");
+            let licenseUpload = document.querySelector("input[name='licenseUpload']");
+            let licenseLabel = document.querySelector("label[for='licenseUpload']");
+        
+                
+
+                if (roleId == "3") { // Doctor
+                    doctorFields.classList.remove("hidden");
+                }
             }
-        }
 
-        function validatePassword() {
-            let password = document.getElementById("pwd").value;
-            let confirmPassword = document.getElementById("confirm_pwd").value;
-            let errorPassword = document.getElementById("password-error");
+            // Run function on page load to set correct visibility
+            window.onload = toggleFields;
 
-            // Password regex: Minimum 8 characters, at least 1 uppercase, 1 lowercase, 1 number, 1 special character
-            let passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
-            if (!passwordRegex.test(password)) {
-                errorPassword.innerText = "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.";
-                errorPassword.classList.remove("hidden");
-                return false;
-            } else if (password !== confirmPassword) {
-                errorPassword.innerText = "Passwords do not match.";
-                errorPassword.classList.remove("hidden");
-                return false;
-            } else {
-                errorPassword.classList.add("hidden");
-                return true;
-            }
-        }
+            document.addEventListener("DOMContentLoaded", function () {
+                let licenseInput = document.getElementById("doctorLicenseNumber");
+                let passwordInput = document.getElementById("pwd");
+                let confirmPasswordInput = document.getElementById("confirm_pwd");
+                let form = document.querySelector("form");
 
-        // Main form validation function
-        function validateForm() {
-            let isLicenseValid = validateLicense();
-            let isPasswordValid = validatePassword();
-            return isLicenseValid && isPasswordValid; // Only submit if both are valid
-        }
+                licenseInput.addEventListener("blur", validateLicense);
+                passwordInput.addEventListener("blur", validatePassword);
+                confirmPasswordInput.addEventListener("blur", validatePassword);
+
+                function validateLicense() {
+                    let licenseValue = licenseInput.value.trim();
+                    let errorMessage = document.getElementById("error-message");
+                    let regex = /^[A-Za-z]\d{2}-\d{2}-\d{6}$|^[A-Za-z]\d{10}$/;
+
+                    if (!regex.test(licenseValue)) {
+                        errorMessage.classList.remove("hidden");
+                        return false;
+                    } else {
+                        errorMessage.classList.add("hidden");
+                        return true;
+                    }
+                }
+
+                function validatePassword() {
+                    let password = passwordInput.value.trim();
+                    let confirmPassword = confirmPasswordInput.value.trim();
+                    let errorPassword = document.getElementById("password-error");
+                    let passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+                    if (!passwordRegex.test(password)) {
+                        errorPassword.innerText = "Password must have 8+ characters, one uppercase, one lowercase, one number, and one special character.";
+                        errorPassword.classList.remove("hidden");
+                        return false;
+                    } else if (password !== confirmPassword) {
+                        errorPassword.innerText = "Passwords do not match.";
+                        errorPassword.classList.remove("hidden");
+                        return false;
+                    } else {
+                        errorPassword.classList.add("hidden");
+                        return true;
+                    }
+                }
+
+                form.addEventListener("submit", function (event) {
+                    let isLicenseValid = validateLicense();
+                    let isPasswordValid = validatePassword();
+
+                    if (!isPasswordValid) {
+                        event.preventDefault(); // Stop submission if any validation fails
+                    } else if (!isLicenseValid){
+                        event.preventDefault();
+                    }
+                });
+            });
+
     </script>
 
     <?php if (isset($_SESSION['success']) && $_SESSION['success'] === true): ?>
