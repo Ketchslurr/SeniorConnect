@@ -16,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET['code'])) {
 
     if ($user) {
         // ✅ Mark the user as verified
-        $stmt = $pdo->prepare("UPDATE user_info SET is_verified = 1, verification_code = NULL WHERE userId = ?");
+        $stmt = $pdo->prepare("UPDATE user_info SET is_verified = 1 WHERE userId = ?");
         if ($stmt->execute([$user['userId']])) {
             $_SESSION['message'] = "Your email has been verified! You can now log in.";
             header("Location: login.php");
@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['verification_code']))
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user) {
-            $stmt = $pdo->prepare("UPDATE user_info SET is_verified = 1, verification_code = NULL WHERE userId = ?");
+            $stmt = $pdo->prepare("UPDATE user_info SET is_verified = 1 WHERE userId = ?");
             if ($stmt->execute([$user['userId']])) {
                 $_SESSION['message'] = "Your email has been verified! You can now log in.";
                 header("Location: login.php");

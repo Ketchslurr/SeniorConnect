@@ -96,11 +96,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $mail->Body    = "
                             <p>Hello <strong>$firstName</strong>,</p>
                             <p>Please verify your email by clicking the link below:</p>
-                            <p><a href='http://senior-production-f9d8.up.railway.app/verifyEmail.php?code=$verificationCode'>Verify Email</a></p>
+                            <p><a href='http://senior-production-f9d8.up.railway.app/views/verifyEmail.php?code=$verificationCode'>Verify Email</a></p>
+                            <p>Or manually enter this verification code:</p>
+                            <h2 style='color: blue;'>$verificationCode</h2>
                             <p>Thank you!</p>
                         ";
-                        $mail->AltBody = "Hello $firstName, Please verify your email by clicking the link: http://senior-production-f9d8.up.railway.app/verifyEmail.php?code=$verificationCode";
-
+                        $mail->AltBody = "Hello $firstName, Please verify your email by clicking the link: http://senior-production-f9d8.up.railway.app/views/verifyEmail.php?code=$verificationCode or manually enter this code: $verificationCode";
                         $mail->send();
 
                         $_SESSION['message'] = "Verification email sent! Please check your inbox.";
