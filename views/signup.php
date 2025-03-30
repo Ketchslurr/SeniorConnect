@@ -2,6 +2,10 @@
 session_start();
 include '../config.php';
 include '../includes/specializations.php';
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require '../vendor/autoload.php'; // Adjust path if necessary
 
 if (!isset($_SESSION['roleId'])) {
     header("Location: select_role.php");
@@ -69,20 +73,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $stmt->execute([$userId, $firstName, $lastName, $age, $gender, $email]);
                     }
 
-                    // ✅ Step 5: Send Verification Email
-                    $to = $email;
-                    $subject = "Verify Your Email Address";
-                    $message = "Hello $firstName,\n\n";
-                    $message .= "Please verify your email by clicking the link below:\n";
-                    $message .= "http://senior-production-f9d8.up.railway.app/verify_email.php?code=$verificationCode\n\n";
-                    $message .= "Thank you!";
-                    $headers = "From: noreply@yourwebsite.com";
+                    // ✅ Step 5: Send Verification Email Using PHPMailer
+                    $mail = new PHPMailer(true);
 
-                    mail($to, $subject, $message, $headers);
+                    try {
+                        // Server settings
+                        $mail->isSMTP();
+                        $mail->Host       = 'smtp-relay.brevo.com'; // Change this to your SMTP server
+                        $mail->SMTPAuth   = true;
+                        $mail->Username   = '8932ef001@smtp-brevo.com'; // Your email
+                        $mail->Password   = '3Xpj6dJGQkI1MPsW'; // Your email password or App Password
+                        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                        $mail->Port       = 587;
 
-                    $_SESSION['message'] = "Verification email sent! Please check your inbox.";
-                    header("Location: verify_email.php");
-                    exit();
+                        // Recipients
+                        $mail->setFrom('wolfjay08@gmail.com', 'Senior Connect');
+                        $mail->addAddress($email, $firstName);
+
+                        // Content
+                        $mail->isHTML(true);
+                        $mail->Subject = 'Verify Your Email Address';
+                        $mail->Body    = "
+                            <p>Hello <strong>$firstName</strong>,</p>
+                            <p>Please verify your email by clicking the link below:</p>
+                            <p><a href='http://senior-production-f9d8.up.railway.app/verifyEmail.php?code=$verificationCode'>Verify Email</a></p>
+                            <p>Thank you!</p>
+                        ";
+                        $mail->AltBody = "Hello $firstName, Please verify your email by clicking the link: http://senior-production-f9d8.up.railway.app/verifyEmail.php?code=$verificationCode";
+
+                        $mail->send();
+
+                        $_SESSION['message'] = "Verification email sent! Please check your inbox.";
+                        header("Location: verifyEmail.php");
+                        exit();
+                    } catch (Exception $e) {
+                        $error = "Email could not be sent. Mailer Error: {$mail->ErrorInfo}";
+                    }
                 } else {
                     $error = "Signup failed. Try again.";
                 }
@@ -91,6 +117,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
+
 
 
 <!DOCTYPE html>
