@@ -76,15 +76,15 @@ $services = $stmtServices->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
                 
-                <h3 class="text-xl font-bold mt-6">Select a Service</h3>
+                <!-- <h3 class="text-xl font-bold mt-6">Select a Service</h3>
                 <div class="flex flex-wrap gap-4 mt-4">
-                    <?php foreach ($services as $service): ?>
-                        <button class="service-btn p-3 bg-gray-50 rounded-lg shadow transition w-40" data-service="<?= $service['service_name'] ?>">
-                            <?= htmlspecialchars($service['service_name']) ?> 
-                            <span class="price text-blue-600 block">₱<?= htmlspecialchars($service['price']) ?></span>
+                    <//?php foreach ($services as $service): ?>
+                        <button class="service-btn p-3 bg-gray-50 rounded-lg shadow transition w-40" data-service="<//?= $service['service_name'] ?>">
+                            <//?= htmlspecialchars($service['service_name']) ?> 
+                            <span class="price text-blue-600 block">₱<//?= htmlspecialchars($service['price']) ?></span>
                         </button>
-                    <?php endforeach; ?>
-                </div>
+                    <//?php endforeach; ?>
+                </div> -->
                 
                 <h3 class="text-xl font-bold mt-6 ">Select a Date</h3>
                 <div class="text-xl font-bold mt-6 flex justify-center items-center"><div id="appointmentDate"></div></div>
@@ -164,7 +164,7 @@ $services = $stmtServices->fetchAll(PDO::FETCH_ASSOC);
         });
 
         // Service Selection Logic
-        const serviceButtons = document.querySelectorAll(".service-btn");
+        // const serviceButtons = document.querySelectorAll(".service-btn");
         serviceButtons.forEach(button => {
             button.addEventListener("click", function () {
                 // Remove selection from all buttons
@@ -230,14 +230,11 @@ $services = $stmtServices->fetchAll(PDO::FETCH_ASSOC);
       
       // Confirm appointment
 document.getElementById("confirmAppointment").addEventListener("click", function () {
-    const selectedService = document.querySelector(".service-btn.selected")?.getAttribute("data-service");
+    // const selectedService = document.querySelector(".service-btn.selected")?.getAttribute("data-service");
     const selectedDate = document.getElementById("appointmentDate").value;
     const selectedTime = document.querySelector("#timeSlots button.bg-blue-500")?.textContent;
 
-    if (!selectedService) {
-        alert("Please select a service.");
-        return;
-    }
+   
     if (!selectedDate) {
         alert("Please select a date.");
         return;
@@ -248,7 +245,7 @@ document.getElementById("confirmAppointment").addEventListener("click", function
     }
 
     // Fill modal with selected data
-    document.getElementById("modalService").textContent = selectedService;
+    // document.getElementById("modalService").textContent = selectedService;
     document.getElementById("modalDate").textContent = selectedDate;
     document.getElementById("modalTime").textContent = selectedTime;
 
@@ -295,12 +292,12 @@ document.getElementById("finalConfirm").addEventListener("click", function () {
 
 // Close Success Modal & Redirect to Payment Page
 document.getElementById("closeSuccessModal").addEventListener("click", function () {
-    const selectedService = document.getElementById("modalService").textContent;
+    // const selectedService = document.getElementById("modalService").textContent;
     const selectedDate = document.getElementById("modalDate").textContent;
     const selectedTime = document.getElementById("modalTime").textContent;
     const professionalId = <?= json_encode($professionalId) ?>;
-
-    window.location.href = `payment.php?professionalId=${professionalId}&service=${encodeURIComponent(selectedService)}&date=${selectedDate}&time=${encodeURIComponent(selectedTime)}`;
+// &service=${encodeURIComponent(selectedService)} removed from the url 4/4/2025
+    window.location.href = `payment.php?professionalId=${professionalId}&date=${selectedDate}&time=${encodeURIComponent(selectedTime)}`;
 });
 
 

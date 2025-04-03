@@ -136,7 +136,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId']) && is
             <thead class="sticky top-0 bg-blue-500 text-white">
                 <tr>
                     <th class="py-3 px-4">Senior Name</th>
-                    <th class="py-3 px-4">Service</th>
+                    <!-- <th class="py-3 px-4">Service</th> -->
                     <th class="py-3 px-4">Date</th>
                     <th class="py-3 px-4">Time</th>
                     <th class="py-3 px-4">Status</th>
@@ -153,7 +153,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId']) && is
                         data-date="<?= $appointment['appointment_date'] ?>"
                         data-name="<?= htmlspecialchars($appointment['senior_name']) ?>">
                         <td class="py-3 px-4 text-center"><?= htmlspecialchars($appointment['senior_name']) ?></td>
-                        <td class="py-3 px-4 text-center"><?= htmlspecialchars($appointment['service_name']) ?></td>
+                        <!-- <td class="py-3 px-4 text-center"><//?= htmlspecialchars($appointment['service_name']) ?></td> -->
                         <td class="py-3 px-4 text-center"><?= htmlspecialchars($appointment['appointment_date']) ?></td>
                         <td class="py-3 px-4 text-center"><?= htmlspecialchars($appointment['appointment_time']) ?></td>
                         <td class="py-3 px-4 text-center">

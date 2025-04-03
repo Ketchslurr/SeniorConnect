@@ -30,7 +30,7 @@ $appointmentTime = $_POST['appointment_time'] ?? '';
 $formatted_time = date("H:i:s", strtotime($appointmentTime));
 
 // Validate required fields
-if (!$seniorCitizenId || !$professionalId || empty($serviceName) || empty($appointmentDate) || empty($appointmentTime)) {
+if (!$seniorCitizenId || !$professionalId || empty($appointmentDate) || empty($appointmentTime)) {
     echo json_encode(['status' => 'error', 'message' => 'All fields are required']);
     exit();
 }

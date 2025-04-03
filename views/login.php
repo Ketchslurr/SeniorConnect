@@ -113,17 +113,17 @@ $googleAuthUrl = $client->createAuthUrl();
                     <label class="flex items-center">
                         <input type="checkbox" class="mr-2"> Remember me
                     </label>
-                    <a href="#" class="text-blue-500 hover:underline">Forgot password?</a>
+                    <a href="forgotpassword.php" class="text-blue-500 hover:underline">Forgot password?</a>
                 </div>
                 
                 <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Login</button>
             </form>
             
             <!-- Google Sign-In Button -->
-            <div class="mt-4 flex items-center justify-center bg-gray-100 p-2 rounded">
+            <!-- <div class="mt-4 flex items-center justify-center bg-gray-100 p-2 rounded">
                 <img src="../assets/Images/google.jpg" alt="Google Logo" class="h-6 w-6 mr-2">
-                <a href="<?= htmlspecialchars($googleAuthUrl) ?>" class="text-gray-700">Sign in with Google</a>
-            </div>
+                <a href="<//?= htmlspecialchars($googleAuthUrl) ?>" class="text-gray-700">Sign in with Google</a>
+            </div> -->
             
             <p class="text-center text-gray-600 mt-4">Don't have an account? <a href="../views/signup.php" class="text-blue-500 hover:underline">Sign up for free!</a></p>
         </div>
