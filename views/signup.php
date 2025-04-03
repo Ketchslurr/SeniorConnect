@@ -152,7 +152,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <input type="text" name="lName" id="lName" class="w-1/2 border p-2 rounded" placeholder="Last Name" required>
                 </div>
                 <p id="name-error" class="text-red-500 text-sm hidden">Names can only contain letters.</p>
-                
+                <label for="date">Birthdate</label>
                 <input type="date" name="birthdate" id="birthdate" class="w-full border p-2 rounded" required>
                 <input type="number" name="age" id="age" class="w-full border p-2 rounded bg-gray-200" readonly>
                 <p id="age-error" class="text-red-500 text-sm hidden">Only seniors (60 years and older) can register.</p>

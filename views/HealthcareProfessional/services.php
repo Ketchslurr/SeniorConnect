@@ -61,7 +61,7 @@ $isAvailable = $doctorAvailability ? $doctorAvailability['is_available'] : 0;
 
                     <div>
                         <p class="text-xl font-semibold"><?= htmlspecialchars($professional['fname'] ?? 'Unknown') ?></p>
-                        <p class="text-gray-600"><?= htmlspecialchars($professional['specialization'] ?? 'No Specialization') ?></p>
+                        <p class="text-gray-600">Specialization: <?= htmlspecialchars($professional['specialization'] ?? 'No Specialization') ?></p>
                         <p class="text-gray-600">Consultation Fee: <?= htmlspecialchars($professional['consultationFee'] ?? '0') ?></p>
                         
                         <!-- Availability Toggle with Modal -->
@@ -178,7 +178,7 @@ $isAvailable = $doctorAvailability ? $doctorAvailability['is_available'] : 0;
                 </div>
                 <div class="mb-4">
                     <label class="block text-gray-700">Consultation Fee</label>
-                    <input type="text" name="consultation" value="<?= htmlspecialchars($professional['consultationFee']) ?>" class="w-full p-2 border rounded" required>
+                    <input type="text" name="consultationFee" value="<?= htmlspecialchars($professional['consultationFee']) ?>" class="w-full p-2 border rounded" required>
                 </div>
                 <div class="mb-4">
                     <label class="block text-gray-700">Age</label>

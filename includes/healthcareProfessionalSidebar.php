@@ -22,7 +22,7 @@
             <span>📊</span><span>Reports</span>
         </a> -->
         <a href="../HealthcareProfessional/services.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
-            <span>🛠</span><span>Services</span>
+            <span>🛠</span><span>Edit Profile</span>
         </a>
         <a href="../HealthcareProfessional/meeting.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
             <span>💬</span><span>Meeting</span>

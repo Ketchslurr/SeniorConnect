@@ -12,6 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $fname = $_POST['fname'];
     $lname = $_POST['lname'];
     $email = $_POST['email'];
+    $consultationFee = $_POST['consultationFee'];
     $specialization = $_POST['specialization'];
 
 //     echo "<pre>";
@@ -32,11 +33,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Prepare SQL query
         if ($profile_picture !== null) {
-            $sql = "UPDATE healthcareprofessional SET fname = :fname, lname = :lname, doctorEmail = :email, specialization = :specialization, profile_picture = :profile_picture WHERE userId = :userId";
+            $sql = "UPDATE healthcareprofessional SET fname = :fname, lname = :lname, doctorEmail = :email, specialization = :specialization, profile_picture = :profile_picture, consultationFee = :consultationFee WHERE userId = :userId";
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(':profile_picture', $profile_picture, PDO::PARAM_LOB);
         } else {
-            $sql = "UPDATE healthcareprofessional SET fname = :fname, lname = :lname, doctorEmail = :email, specialization = :specialization WHERE userId = :userId";
+            $sql = "UPDATE healthcareprofessional SET fname = :fname, lname = :lname, doctorEmail = :email, specialization = :specialization, consultationFee = :consultationFee WHERE userId = :userId";
             $stmt = $pdo->prepare($sql);
         }
 
@@ -45,6 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bindParam(':lname', $lname);
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':specialization', $specialization);
+        $stmt->bindParam(':consultationFee', $consultationFee);
         $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
 
         if ($stmt->execute()) {
