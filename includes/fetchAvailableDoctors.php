@@ -62,7 +62,7 @@ foreach ($doctors as $doctor) {
                                     <img src="../../assets/Images/default-doctor.png" class="w-24 h-24 rounded-full border mb-4" />
                                 <?php endif; ?>
                                 <h3 class="text-xl font-semibold"> <?= htmlspecialchars($doctor['fname'] . ' ' . $doctor['lname']) ?> </h3>
-                                <p class="text-gray-600">Consultation Fee: ₱<?= htmlspecialchars(number_format($doctor['consultationFee'], 2)) ?></p>
+                                <p class="text-gray-600">Consultation Fee: ₱<?= isset($doctor['consultationFee']) ? htmlspecialchars(number_format($doctor['consultationFee'], 2)) : '0.00' ?></p>
                                 <div class="flex gap-4 mt-4">
                                     <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition" 
                                         onclick="window.location.href='bookAppointment.php?professionalId=<?= $doctor['professionalId'] ?>'">

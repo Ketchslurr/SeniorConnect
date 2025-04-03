@@ -70,7 +70,7 @@
             </button>
             <div id="fitnessDropdown" class="hidden ml-6 space-y-2 mt-2">
                 <a href="../SeniorCitizen/seniorFitness.php" class="block text-gray-600 hover:text-blue-500">🏋️ Browse</a>
-                <a href="../SeniorCitizen/library.php" class="block text-gray-600 hover:text-blue-500">🎥 Purchased Videos</a>
+                <!-- <a href="../SeniorCitizen/library.php" class="block text-gray-600 hover:text-blue-500">🎥 Purchased Videos</a> -->
             </div>
         </div>
 
