@@ -26,18 +26,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($password !== $confirmPass) {
         $error = "Passwords do not match!";
     } else {
-        // ✅ Step 1: Validate Email Using Abstract API
+        //  Step 1: Validate Email Using Abstract API
         $apiKey = "eaa405e188f24410b1b9c8b87a1a8b4e"; // Replace with your API key
         $apiUrl = "https://emailvalidation.abstractapi.com/v1/?api_key=$apiKey&email=$email";
         
         $response = file_get_contents($apiUrl);
         $result = json_decode($response, true);
 
-        // ✅ Step 2: Check if email is valid
+        //Step 2: Check if email is valid
         if ($result['deliverability'] !== 'DELIVERABLE' || $result['is_disposable_email'] === true) {
             $error = "Invalid or temporary email. Please use a real email.";
         } else {
-            // ✅ Step 3: Check if email is already registered
+            // Step 3: Check if email is already registered
             $stmt = $pdo->prepare("SELECT COUNT(*) FROM user_info WHERE email = ?");
             $stmt->execute([$email]);
             $emailExists = $stmt->fetchColumn();
@@ -45,8 +45,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($emailExists > 0) {
                 $error = "Email is already registered. Please use a different email.";
             } else {
-                // ✅ Step 4: Generate Verification Code
-                $verificationCode = bin2hex(random_bytes(16));
+                // Step 4: Generate Verification Code
+                $verificationCode = str_pad(mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
                 $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
                 $stmt = $pdo->prepare("INSERT INTO user_info (fname, lname, age, gender, email, pwd, roleId, verification_code, is_verified) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)");
@@ -73,16 +73,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $stmt->execute([$userId, $firstName, $lastName, $age, $gender, $email]);
                     }
 
-                    // ✅ Step 5: Send Verification Email Using PHPMailer
+                    //  Step 5: Send Verification Email Using PHPMailer
                     $mail = new PHPMailer(true);
 
                     try {
                         // Server settings
                         $mail->isSMTP();
-                        $mail->Host       = 'smtp-relay.brevo.com'; // Change this to your SMTP server
+                        $mail->Host       = 'smtp-relay.brevo.com'; 
                         $mail->SMTPAuth   = true;
-                        $mail->Username   = '8932ef001@smtp-brevo.com'; // Your email
-                        $mail->Password   = '3Xpj6dJGQkI1MPsW'; // Your email password or App Password
+                        $mail->Username   = '8932ef001@smtp-brevo.com';
+                        $mail->Password   = '3Xpj6dJGQkI1MPsW'; 
                         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                         $mail->Port       = 587;
 
@@ -120,7 +120,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -148,10 +147,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <h2 class="text-2xl font-bold text-center">Sign Up</h2>
             <?php if (isset($error)) echo "<p class='text-red-500 text-center mt-2'>$error</p>"; ?>
             <form method="POST" enctype="multipart/form-data" class="mt-4 space-y-4">
-            <div class="flex space-x-4">
-                    <input type="text" name="fName" class="w-1/2 border p-2 rounded" placeholder="First Name" required>
-                    <input type="text" name="lName" class="w-1/2 border p-2 rounded" placeholder="Last Name" required>
+                <div class="flex space-x-4">
+                    <input type="text" name="fName" id="fName" class="w-1/2 border p-2 rounded" placeholder="First Name" required>
+                    <input type="text" name="lName" id="lName" class="w-1/2 border p-2 rounded" placeholder="Last Name" required>
                 </div>
+                <p id="name-error" class="text-red-500 text-sm hidden">Names can only contain letters.</p>
+                
                 <input type="date" name="birthdate" id="birthdate" class="w-full border p-2 rounded" required>
                 <input type="number" name="age" id="age" class="w-full border p-2 rounded bg-gray-200" readonly>
                 <p id="age-error" class="text-red-500 text-sm hidden">Only seniors (60 years and older) can register.</p>
@@ -164,10 +165,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </select>
                 <div id="doctorFields" class="hidden">
                     <?php echo getSpecializationDropdown(); ?>
-                    <input type="text" id="doctorLicenseNumber" name="doctorLicenseNumber" class="w-full border p-2 rounded" placeholder="License Number" >
+                    <input type="text" id="doctorLicenseNumber" name="doctorLicenseNumber" class="w-full border p-2 rounded" placeholder="License Number">
                     <p id="error-message" class="text-red-500 text-sm hidden">Invalid License Number format. Example: D12-34-567890 or D1234567890</p>
                 </div>
-                <label for="licenseUpload" class="block" >Upload Valid ID</label>
+                <label for="licenseUpload" class="block">Upload Valid ID</label>
                 <input type="file" name="licenseUpload" class="w-full border p-2 rounded" accept=".pdf,.jpg,.png" required>
                 <input type="email" name="email" class="w-full border p-2 rounded" placeholder="Email" required>
                 <input type="password" id="pwd" name="pwd" class="w-full border p-2 rounded" placeholder="Password" required>
@@ -185,6 +186,60 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script>
         let roleId = <?php echo isset($_SESSION['roleId']) ? json_encode($_SESSION['roleId']) : 'null'; ?>;
 
+        document.addEventListener("DOMContentLoaded", function () {
+            let birthdateInput = document.getElementById("birthdate");
+            let ageInput = document.getElementById("age");
+            let ageError = document.getElementById("age-error");
+            let form = document.querySelector("form");
+            let nameError = document.getElementById("name-error");
+
+            document.getElementById("fName").addEventListener("input", validateName);
+            document.getElementById("lName").addEventListener("input", validateName);
+
+            function validateName() {
+                let fName = document.getElementById("fName").value;
+                let lName = document.getElementById("lName").value;
+                let nameRegex = /^[A-Za-z]+$/;
+                if (!nameRegex.test(fName) || !nameRegex.test(lName)) {
+                    nameError.classList.remove("hidden");
+                } else {
+                    nameError.classList.add("hidden");
+                }
+            }
+
+            birthdateInput.addEventListener("change", function () {
+                let birthdate = new Date(this.value);
+                let today = new Date();
+                let age = today.getFullYear() - birthdate.getFullYear();
+                let monthDiff = today.getMonth() - birthdate.getMonth();
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdate.getDate())) {
+                    age--;
+                }
+                ageInput.value = age;
+                if (roleId == "2" && age < 60) {
+                    ageError.classList.remove("hidden");
+                } else {
+                    ageError.classList.add("hidden");
+                }
+            });
+
+            form.addEventListener("submit", function (event) {
+                if (roleId == "2" && parseInt(ageInput.value) < 60) {
+                    event.preventDefault();
+                    ageError.classList.remove("hidden");
+                }
+            });
+
+            if (roleId == "3") {
+                document.getElementById("doctorFields").classList.remove("hidden");
+            }
+        });
+    </script>
+
+    <script>
+        let roleId = <?php echo isset($_SESSION['roleId']) ? json_encode($_SESSION['roleId']) : 'null'; ?>;
+
+        
 
 
         document.addEventListener("DOMContentLoaded", function () {

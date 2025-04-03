@@ -1,11 +1,14 @@
 <?php
 include 'config.php';
-// session_start();
 
-if (isset($_SESSION['user_id'])) {
-    header("Location: views/dashboard.php");
-    exit();
-}
+// Fetch active doctors
+$activeDoctors = $pdo->query("SELECT COUNT(*) FROM available_doctors WHERE is_available = '1'")->fetchColumn();
+
+// Fetch active users (excluding admin)
+$activeUsers = $pdo->query("SELECT COUNT(*) FROM user_info WHERE roleId IN (2, 3)")->fetchColumn();
+
+// Fetch total appointments
+$totalAppointments = $pdo->query("SELECT COUNT(*) FROM appointment")->fetchColumn();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -65,49 +68,24 @@ if (isset($_SESSION['user_id'])) {
 
                 <div class="mt-12 grid grid-cols-3 gap-6">
                     <div class="bg-white p-4 rounded-lg shadow-md text-center">
-                        <div class="text-2xl font-bold text-blue-600" id="countOne">0</div>
+                        <div class="text-2xl font-bold text-blue-600"><?= $activeDoctors ?></div>
                         <h3 class="text-gray-600 mt-2">Active Doctors</h3>
                     </div>
                     <div class="bg-white p-4 rounded-lg shadow-md text-center">
-                        <div class="text-2xl font-bold text-blue-600" id="countTwo">0</div>
+                        <div class="text-2xl font-bold text-blue-600"><?= $activeUsers ?></div>
                         <h3 class="text-gray-600 mt-2">Active Users</h3>
                     </div>
                     <div class="bg-white p-4 rounded-lg shadow-md text-center">
-                        <div class="text-2xl font-bold text-blue-600" id="countThree">0</div>
-                        <h3 class="text-gray-600 mt-2">Medical Partners</h3>
+                        <div class="text-2xl font-bold text-blue-600"><?= $totalAppointments ?></div>
+                        <h3 class="text-gray-600 mt-2">Total Appointments</h3>
                     </div>
                 </div>
             </div>
-
             <div class="md:w-1/2">
                 <img src="assets/Images/image.png" alt="Healthcare illustration" 
                      class="w-full max-w-xl mx-auto">
             </div>
         </div>
     </main>
-
-    <script>
-        // Counting animation function
-        function countTo(targetNumber, duration, elementId) {
-            const countElement = document.getElementById(elementId);
-            let startNumber = 0;
-            const increment = targetNumber / (duration / 100);
-            const interval = setInterval(() => {
-                startNumber += increment; 
-                if (startNumber >= targetNumber) {
-                    clearInterval(interval);
-                    startNumber = targetNumber; 
-                }
-                countElement.textContent = Math.floor(startNumber); 
-            }, 100);
-        }
-
-        // Start animations after page load
-        window.addEventListener('DOMContentLoaded', (event) => {
-            countTo(5, 3000, 'countOne');
-            countTo(200, 3000, 'countTwo');
-            countTo(10, 3000, 'countThree');
-        });
-    </script>
 </body>
 </html>

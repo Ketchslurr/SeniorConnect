@@ -47,7 +47,7 @@ $isAvailable = $doctorAvailability ? $doctorAvailability['is_available'] : 0;
         <?php include '../../includes/healthcareProfessionalSidebar.php'; ?>
 
         <main class="flex-1 p-6">
-            <h2 class="text-3xl font-bold text-center mb-6">Manage Your Services</h2>
+            <h2 class="text-3xl font-bold text-center mb-6">Manage Your Profile</h2> <!-- Changed services to Profile  4/3/2025  -->
 
           <!-- Profile Section -->
             <div class="bg-white p-6 rounded-lg shadow-md mb-6 flex justify-between items-center">
@@ -62,6 +62,7 @@ $isAvailable = $doctorAvailability ? $doctorAvailability['is_available'] : 0;
                     <div>
                         <p class="text-xl font-semibold"><?= htmlspecialchars($professional['fname'] ?? 'Unknown') ?></p>
                         <p class="text-gray-600"><?= htmlspecialchars($professional['specialization'] ?? 'No Specialization') ?></p>
+                        <p class="text-gray-600">Consultation Fee: <?= htmlspecialchars($professional['consultationFee'] ?? '0') ?></p>
                         
                         <!-- Availability Toggle with Modal -->
                 <div class="flex items-center">
@@ -91,7 +92,8 @@ $isAvailable = $doctorAvailability ? $doctorAvailability['is_available'] : 0;
             </div>
 
             <!-- Services Offered -->
-            <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+             <!-- Commented out for now 4/3/2025 -->
+            <!-- <div class="bg-white p-6 rounded-lg shadow-md mb-6">
                 <h3 class="text-2xl font-bold mb-4">Services Offered</h3>
                 <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 mb-4" onclick="document.getElementById('addService').style.display='flex'">
                     + Add Service
@@ -118,7 +120,7 @@ $isAvailable = $doctorAvailability ? $doctorAvailability['is_available'] : 0;
                         <p class="text-gray-500">No services added yet.</p>
                     <?php } ?>
                 </ul>
-            </div>
+            </div> -->
         </main>
     </div>
 
@@ -173,6 +175,10 @@ $isAvailable = $doctorAvailability ? $doctorAvailability['is_available'] : 0;
                 <div class="mb-4">
                     <label class="block text-gray-700">Specialization</label>
                     <input type="text" name="specialization" value="<?= htmlspecialchars($professional['specialization']?? 'No Specialization') ?>" class="w-full p-2 border rounded" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700">Consultation Fee</label>
+                    <input type="text" name="consultation" value="<?= htmlspecialchars($professional['consultationFee']) ?>" class="w-full p-2 border rounded" required>
                 </div>
                 <div class="mb-4">
                     <label class="block text-gray-700">Age</label>

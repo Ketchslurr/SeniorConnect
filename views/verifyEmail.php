@@ -83,7 +83,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['verification_code']))
     <div class="flex justify-center items-center min-h-screen">
         <div class="bg-white p-8 rounded-lg shadow-lg w-96">
             <h2 class="text-2xl font-bold text-center mb-4">Email Verification</h2>
-            <p class="text-gray-600 text-center mb-6">Enter your verification code below.</p>
+            <p class="text-gray-600 text-center mb-6">The verification code has been sent to your email. Please enter your verification code below.</p>
 
             <?php if (!empty($error)): ?>
                 <p class="text-red-500 text-center"><?php echo $error; ?></p>

@@ -2,6 +2,7 @@
 include '../config.php';
 session_start();
 require '../vendor/autoload.php';
+require_once 'authFunctions.php';
 
 $client = new Google\Client();
 $client->setAuthConfig(__DIR__ . '/../auth/client_secret_573751304329-u46e5l3l4o001omab337gl4e9jbsh8a8.apps.googleusercontent.com.json');

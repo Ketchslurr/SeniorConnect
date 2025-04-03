@@ -7,19 +7,13 @@ if (!isset($_SESSION['userId'])) {
     exit();
 }
 
-$seniorId = $_SESSION['seniorId'];
+$apiKey = 'AIzaSyC5nucTs5Qk3cWD8_M3hJZWwiYyDdlTPAA'; 
+$defaultQuery = 'senior fitness workouts';
+$searchQuery = isset($_GET['search']) ? urlencode($_GET['search']) : urlencode($defaultQuery);
 
-// Fetch available fitness classes
-$sql = "SELECT * FROM fitness_classes";
-$stmt = $pdo->prepare($sql);
-$stmt->execute();
-$classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Fetch purchased fitness classes
-$sqlPurchased = "SELECT fitnessId FROM fitness_purchases WHERE seniorId = :seniorId AND payment_status = 'Completed'";
-$stmtPurchased = $pdo->prepare($sqlPurchased);
-$stmtPurchased->execute(['seniorId' => $seniorId]);
-$purchasedClasses = $stmtPurchased->fetchAll(PDO::FETCH_COLUMN);
+$apiUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q={$searchQuery}&maxResults=10&key={$apiKey}";
+$response = file_get_contents($apiUrl);
+$videos = json_decode($response, true)['items'] ?? [];
 ?>
 
 <!DOCTYPE html>
@@ -34,58 +28,41 @@ $purchasedClasses = $stmtPurchased->fetchAll(PDO::FETCH_COLUMN);
     <?php include '../../includes/topbar.php'; ?>
     
     <div class="flex">
-        <!-- Sidebar -->
         <?php include '../../includes/seniorCitizenSidebar.php'; ?>
 
-        <!-- Main Content -->
         <div class="flex-1 p-6">
             <h2 class="text-2xl font-semibold text-gray-700 mb-4">Fitness Classes</h2>
-
+            
+            <!-- Search Bar -->
+            <form method="GET" action="" class="mb-6 flex">
+                <input type="text" name="search" placeholder="Search fitness videos..." class="w-full p-2 border rounded-l" required>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-700">Search</button>
+            </form>
+            
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <?php foreach ($classes as $class) : ?>
+                <?php foreach ($videos as $video) : ?>
                     <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                        <div class="relative w-full h-48">
-                            <video class="w-full h-full object-cover" controls>
-                                <source src="../../<?= htmlspecialchars($class['video_url']) ?>" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
-                        </div>
+                        <img class="w-full h-48 object-cover" src="<?= htmlspecialchars($video['snippet']['thumbnails']['medium']['url']) ?>" alt="Video Thumbnail">
                         <div class="p-4">
-                            <h3 class="text-lg font-semibold"><?= htmlspecialchars($class['title']) ?></h3>
-                            <p class="text-gray-600 text-sm"><?= htmlspecialchars($class['description']) ?></p>
-                            <p class="text-blue-600 font-semibold mt-2">
-                                <?= $class['price'] == 0 ? "Free" : "₱" . $class['price'] ?>
+                            <h3 class="text-lg font-semibold">
+                                <?= htmlspecialchars($video['snippet']['title']) ?>
+                            </h3>
+                            <p class="text-gray-600 text-sm">
+                                <?= htmlspecialchars($video['snippet']['description']) ?>
                             </p>
-
-                            <div class="mt-4">
-                                <?php if ($class['price'] == 0) : ?>
-                                    <a href="watch.php?fitnessId=<?= $class['fitnessId'] ?>" class="block bg-green-500 text-white text-center px-4 py-2 rounded hover:bg-green-600 transition">
-                                        Watch Now
-                                    </a>
-                                <?php elseif (in_array($class['fitnessId'], $purchasedClasses)) : ?>
-                                    <p class="text-green-600 font-semibold text-center">✔ You have already purchased this video</p>
-                                    <a href="watch.php?fitnessId=<?= $class['fitnessId'] ?>" class="block bg-green-500 text-white text-center px-4 py-2 rounded hover:bg-green-600 transition mt-2">
-                                        Watch Now
-                                    </a>
-                                <?php else : ?>
-                                    <form action="purchase.php" method="POST">
-                                        <input type="hidden" name="fitnessId" value="<?= $class['fitnessId'] ?>">
-                                        <button type="submit" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
-                                            Purchase
-                                        </button>
-                                    </form>
-                                <?php endif; ?>
-                            </div>
+                            <a href="watch.php?videoId=<?= htmlspecialchars($video['id']['videoId']) ?>" 
+                               class="block mt-2 bg-green-500 text-white text-center px-4 py-2 rounded hover:bg-green-600 transition">
+                                Watch Now
+                            </a>
                         </div>
                     </div>
                 <?php endforeach; ?>
                 
-                <?php if (empty($classes)) : ?>
-                    <p class="text-center text-gray-500 p-4 col-span-full">No fitness classes available.</p>
+                <?php if (empty($videos)) : ?>
+                    <p class="text-center text-gray-500 p-4 col-span-full">No fitness videos found.</p>
                 <?php endif; ?>
             </div>
         </div>
     </div>
-
 </body>
 </html>
