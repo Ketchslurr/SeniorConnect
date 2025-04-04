@@ -37,6 +37,15 @@ $client->setAccessType('offline');
 
 // 🔹 OAuth 2.0 Authentication using Refresh Token
 $refreshToken = '1//04ZTV_-RXzZqjCgYIARAAGAQSNwF-L9IrnRGeQsF87V7mFqyc8ow32aNmuYObtNrcgtenIb9HuKDgFqgPRLFpD20ADW4pt6ixX9I'; // Replace with your refresh token
+
+$accessToken = $client->fetchAccessTokenWithRefreshToken($refreshToken);
+
+if (isset($accessToken['error'])) {
+    echo json_encode(['success' => false, 'error' => 'Failed to fetch access token: ' . $accessToken['error']]);
+    exit();
+}
+
+$client->setAccessToken($accessToken);
 $client->fetchAccessTokenWithRefreshToken($refreshToken);
 $accessToken = $client->getAccessToken();
 $client->setAccessToken($accessToken);

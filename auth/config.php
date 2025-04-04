@@ -8,6 +8,7 @@ $client->setAuthConfig(__DIR__ . '/client_secret_573751304329-u46e5l3l4o001omab3
 $client->setRedirectUri('http://localhost/senior_connect/auth/oauth-callback.php');
 $client->addScope(Google\Service\Calendar::CALENDAR);
 $client->setAccessType('offline'); // To get a refresh token
+$client->setPrompt('consent');
 
 // Store the Google client in session
 $_SESSION['google_client'] = serialize($client);
