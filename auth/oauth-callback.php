@@ -19,15 +19,13 @@ if (isset($_GET['code'])) {
             throw new Exception("Google returned an error while fetching the access token: " . json_encode($token));
         }
 
-        // ✅ Set the access token before making any API call
         $client->setAccessToken($token);
 
-        // ✅ Just to verify access token is set
         if (!$client->getAccessToken()) {
             throw new Exception("Access token is empty or invalid.");
         }
 
-        // ✅ Call to Google UserInfo API
+        // ✅ Use authenticated Guzzle HTTP Client
         $oauthService = new Google\Service\Oauth2($client);
         $userInfo = $oauthService->userinfo->get();
 
@@ -71,6 +69,7 @@ if (isset($_GET['code'])) {
             exit();
         }
 
+        // Redirect to appropriate dashboard
         switch ($user['roleId']) {
             case 1:
                 header("Location: ../views/Admin/adminDashboard.php");
