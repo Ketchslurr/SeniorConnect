@@ -2,10 +2,11 @@
 include '../config.php';
 session_start();
 require '../vendor/autoload.php';
+
 use GuzzleHttp\Client as GuzzleClient;
 
 $client = new Google\Client();
-$client->setAuthConfig(__DIR__ . '/../auth/client_secret_573751304329-u46e5l3l4o001omab337gl4e9jbsh8a8.apps.googleusercontent.com.json');
+$client->setAuthConfig(__DIR__ . '/../auth/client_secret.json');
 $client->setRedirectUri('https://senior-production-f9d8.up.railway.app/auth/oauth-callback.php');
 $client->addScope('email');
 $client->addScope('profile');
@@ -17,32 +18,20 @@ if (isset($_GET['code'])) {
         $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
 
         if (isset($token['error'])) {
-            throw new Exception("Google returned an error while fetching the access token: " . json_encode($token));
+            throw new Exception("Token error: " . json_encode($token));
         }
 
+        // Set access token
         $client->setAccessToken($token);
 
-        if (!$client->getAccessToken()) {
-            throw new Exception("Access token is empty or invalid.");
-        }
-
-        // ✅ Debug: Dump token and test with curl
-        $accessToken = $token['access_token'];
-
-        $client = new GuzzleHttp\Client();
-        $response = $client->get('https://www.googleapis.com/oauth2/v3/userinfo', [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $accessToken
-            ]
-        ]);
-
-        $userInfo = json_decode($response->getBody()->getContents());
+        // Fetch user info using Google Client (more reliable)
+        $oauthService = new Google\Service\Oauth2($client);
+        $userInfo = $oauthService->userinfo->get();
 
         $email = $userInfo->email;
         $fullName = $userInfo->name;
 
-
-        // Check if user already exists
+        // Check if user exists
         $stmt = $pdo->prepare("SELECT ui.userId, ui.fname, ui.roleId, hp.professionalId 
                                FROM user_info ui 
                                LEFT JOIN healthcareprofessional hp ON ui.userId = hp.userId 
@@ -79,7 +68,6 @@ if (isset($_GET['code'])) {
             exit();
         }
 
-        // Redirect to appropriate dashboard
         switch ($user['roleId']) {
             case 1:
                 header("Location: ../views/Admin/adminDashboard.php");
@@ -99,4 +87,3 @@ if (isset($_GET['code'])) {
         exit();
     }
 }
-?>
