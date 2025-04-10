@@ -12,16 +12,20 @@ $client->setAccessType('offline');
 $client->setPrompt('consent');
 
 if (isset($_GET['code'])) {
-    $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+    try {
+        $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
 
-    if ($client->isAccessTokenExpired()) {
-        // Handle token expiration, possibly refresh the token
-        echo "Token expired!";
-        exit();
-    }
+        if (isset($token['error'])) {
+            throw new Exception($token['error']);
+        }
 
-    if (!isset($token['error'])) {
         $client->setAccessToken($token);
+
+        if ($client->isAccessTokenExpired()) {
+            echo "Token expired!";
+            exit();
+        }
+
         $oauthService = new Google\Service\Oauth2($client);
         $userInfo = $oauthService->userinfo->get();
 
@@ -38,7 +42,6 @@ if (isset($_GET['code'])) {
 
         if ($user) {
             $_SESSION['userId'] = $user['userId'];
-            // $_SESSION['username'] = $user['Username'];
             $_SESSION['fname'] = $user['fname'];
             $_SESSION['role'] = $user['roleId'];
 
@@ -46,7 +49,6 @@ if (isset($_GET['code'])) {
             if ($user['roleId'] == 3) {
                 $_SESSION['professionalId'] = $user['professionalId'];
             }
-            
 
             // If user has no role, redirect to role selection
             if (empty($user['roleId'])) {
@@ -57,17 +59,15 @@ if (isset($_GET['code'])) {
             }
         } else {
             // Insert new user without a role
-            $stmt = $pdo->prepare("INSERT INTO user_info (fName, email, roleId) VALUES (?, ?, ?, NULL)");
-            $stmt->execute([$fullName, $fullName, $email]);
+            $stmt = $pdo->prepare("INSERT INTO user_info (fName, email, roleId) VALUES (?, ?, NULL)");
+            $stmt->execute([$fullName, $email]);
 
             $_SESSION['userId'] = $pdo->lastInsertId();
-            // $_SESSION['username'] = $fullName;
             $_SESSION['fName'] = $fullName;
             $_SESSION['role'] = null;
             $_SESSION['googleName'] = $fullName;
             $_SESSION['googleEmail'] = $email;
 
-            // Redirect to role selection
             header("Location: ../views/select_role.php");
             exit();
         }
@@ -86,9 +86,10 @@ if (isset($_GET['code'])) {
             default:
                 die("Invalid role assigned.");
         }
+
+    } catch (Exception $e) {
+        echo "Authentication error: " . htmlspecialchars($e->getMessage());
         exit();
-    } else {
-        echo "Authentication failed: " . $token['error'];
     }
 }
 ?>
