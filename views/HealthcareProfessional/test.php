@@ -7,16 +7,23 @@ $client->setScopes(Google_Service_Calendar::CALENDAR_EVENTS);
 $client->setAccessType('offline');
 $client->setPrompt('consent');
 
-// Generate the authentication URL
-$authUrl = $client->createAuthUrl();
-echo "Go to the following URL and grant access:\n$authUrl\n";
+// Step 1: If the code is not present, redirect to the Google authorization page
+if (!isset($_GET['code'])) {
+    // Generate the authorization URL
+    $authUrl = $client->createAuthUrl();
+    // Redirect the user to the authorization URL
+    header('Location: ' . $authUrl);
+    exit();
+}
 
-// After visiting the URL, Google will give you a code. Enter the code here.
-echo "\nEnter verification code: ";
-$authCode = trim(fgets(STDIN));
-
-// Exchange the authorization code for an access token and refresh token
+// Step 2: If the code is present, exchange it for the refresh token
+$authCode = $_GET['code'];
 $accessToken = $client->fetchAccessTokenWithAuthCode($authCode);
 
-// Print the response containing the refresh token
-print_r($accessToken);
+// Store the access token and refresh token
+if (isset($accessToken['refresh_token'])) {
+    echo 'Refresh Token: ' . $accessToken['refresh_token']; // Output the refresh token to copy it
+} else {
+    echo 'Error: No refresh token found.';
+}
+?>
