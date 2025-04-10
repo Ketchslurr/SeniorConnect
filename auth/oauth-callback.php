@@ -16,16 +16,18 @@ if (isset($_GET['code'])) {
         $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
 
         if (isset($token['error'])) {
-            throw new Exception($token['error']);
+            throw new Exception("Google returned an error while fetching the access token: " . json_encode($token));
         }
 
+        // ✅ Set the access token before making any API call
         $client->setAccessToken($token);
 
-        if ($client->isAccessTokenExpired()) {
-            echo "Token expired!";
-            exit();
+        // ✅ Just to verify access token is set
+        if (!$client->getAccessToken()) {
+            throw new Exception("Access token is empty or invalid.");
         }
 
+        // ✅ Call to Google UserInfo API
         $oauthService = new Google\Service\Oauth2($client);
         $userInfo = $oauthService->userinfo->get();
 
@@ -45,12 +47,10 @@ if (isset($_GET['code'])) {
             $_SESSION['fname'] = $user['fname'];
             $_SESSION['role'] = $user['roleId'];
 
-            // Store professionalId if the user is a Healthcare Professional
             if ($user['roleId'] == 3) {
                 $_SESSION['professionalId'] = $user['professionalId'];
             }
 
-            // If user has no role, redirect to role selection
             if (empty($user['roleId'])) {
                 $_SESSION['googleName'] = $fullName;
                 $_SESSION['googleEmail'] = $email;
@@ -58,7 +58,6 @@ if (isset($_GET['code'])) {
                 exit();
             }
         } else {
-            // Insert new user without a role
             $stmt = $pdo->prepare("INSERT INTO user_info (fName, email, roleId) VALUES (?, ?, NULL)");
             $stmt->execute([$fullName, $email]);
 
@@ -72,7 +71,6 @@ if (isset($_GET['code'])) {
             exit();
         }
 
-        // Redirect based on role
         switch ($user['roleId']) {
             case 1:
                 header("Location: ../views/Admin/adminDashboard.php");
@@ -88,7 +86,7 @@ if (isset($_GET['code'])) {
         }
 
     } catch (Exception $e) {
-        echo "Authentication error: " . htmlspecialchars($e->getMessage());
+        echo "<pre>Authentication error:\n" . htmlspecialchars($e->getMessage()) . "</pre>";
         exit();
     }
 }
