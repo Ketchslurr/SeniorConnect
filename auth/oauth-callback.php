@@ -6,8 +6,13 @@ require '../vendor/autoload.php';
 $client = new Google\Client();
 $client->setAuthConfig(__DIR__ . '/../auth/client_secret_573751304329-u46e5l3l4o001omab337gl4e9jbsh8a8.apps.googleusercontent.com.json');
 $client->setRedirectUri('https://senior-production-f9d8.up.railway.app/auth/oauth-callback.php');
-$client->addScope('email');
-$client->addScope('profile');
+$client->addScope(Google\Service\Oauth2::USERINFO_EMAIL);
+$client->addScope(Google\Service\Oauth2::USERINFO_PROFILE);
+$client->addScope(Google\Service\Calendar::CALENDAR); // Add this
+$client->setAccessType('offline');
+$client->setPrompt('consent');
+
+
 
 if (isset($_GET['code'])) {
     $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);

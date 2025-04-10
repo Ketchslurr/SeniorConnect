@@ -98,7 +98,15 @@ $event = new Google_Service_Calendar_Event([
     ]
 ]);
 
-$event = $calendarService->events->insert($calendarId, $event, ['conferenceDataVersion' => 1]);
+// $event = $calendarService->events->insert($calendarId, $event, ['conferenceDataVersion' => 1]);
+$event = $calendarService->events->insert(
+    $calendarId,
+    $event,
+    [
+        'conferenceDataVersion' => 1,
+        'sendUpdates' => 'all'
+    ]
+);
 
 $meetingLink = $event->getHangoutLink();
 
