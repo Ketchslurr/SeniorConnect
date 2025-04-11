@@ -2,7 +2,7 @@
 require '../vendor/autoload.php';
 
 $client = new Google_Client();
-$client->setAuthConfig('client_secret_573751304329-4hia4bhoqa6vt3uk8of75ps7eqep5tka.apps.googleusercontent.com.json');
+$client->setAuthConfig('client_secret.json');
 $client->setScopes(Google_Service_Calendar::CALENDAR_EVENTS);
 $client->setAccessType('offline');
 $client->setPrompt('consent');
