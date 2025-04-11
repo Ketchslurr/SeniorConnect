@@ -18,7 +18,15 @@ if (isset($_GET['code'])) {
         $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
         // Set access token
         $client->setAccessToken($token);
+
+        $_SESSION['access_token'] = $token;
+
         
+        // If refresh_token is returned (only on first consent)
+        if (isset($token['refresh_token'])) {
+            $_SESSION['refresh_token'] = $token['refresh_token'];
+        }
+
         if (isset($token['error'])) {
             throw new Exception("Token error: " . json_encode($token));
         }
