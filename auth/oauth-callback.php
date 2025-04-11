@@ -16,13 +16,14 @@ $client->setPrompt('consent');
 if (isset($_GET['code'])) {
     try {
         $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
-
+        // Set access token
+        $client->setAccessToken($token);
+        
         if (isset($token['error'])) {
             throw new Exception("Token error: " . json_encode($token));
         }
 
-        // Set access token
-        $client->setAccessToken($token);
+  
 
         // Fetch user info using Google Client (more reliable)
         $oauthService = new Google\Service\Oauth2($client);
