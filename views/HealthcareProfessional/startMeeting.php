@@ -30,8 +30,8 @@ $professionalId = $_SESSION['professionalId'];
 
 // 🔹 Load Google API Credentials
 $client = new Client();
-// $client->setAuthConfig(__DIR__ . '/../../auth/client_secret.json');
-$client->setAuthConfig('../../api/client_secret.json'); // Ensure this path is correct
+$client->setAuthConfig(__DIR__ . '/../../auth/client_secret.json');
+// $client->setAuthConfig('../../api/client_secret.json'); // Ensure this path is correct
 $client->setScopes(Calendar::CALENDAR_EVENTS);
 $client->setAccessType('offline');
 
