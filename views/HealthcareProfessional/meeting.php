@@ -67,6 +67,7 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
     fetch('startMeeting.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ appointmentId: appointmentId })
     })
     .then(response => response.text()) // Get raw response instead of JSON
