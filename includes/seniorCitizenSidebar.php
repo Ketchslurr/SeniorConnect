@@ -77,9 +77,9 @@
         <a href="#" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
             <span>⚙️</span><span>Settings</span>
         </a>
-        <!-- <a href="../prescriptionMeeting.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
-            <span>📡</span><span>meeting</span>
-        </a> -->
+        <a href="../SeniorCitizen/realTimeMonitoring.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
+            <span>📡</span><span>Real Time Monitoring</span>
+        </a>
     </nav>
 </aside>
 
