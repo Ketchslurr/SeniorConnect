@@ -60,7 +60,12 @@ $isAvailable = $doctorAvailability ? $doctorAvailability['is_available'] : 0;
                     <?php endif; ?>
 
                     <div>
-                        <p class="text-xl font-semibold"><?= htmlspecialchars($professional['fname'] ?? 'Unknown') ?></p>
+                        <p class="text-xl font-semibold">
+                            <?= htmlspecialchars($professional['fname']. ' ' . $professional['lname'] ?? 'Unknown') ?>
+                            <?php if (!empty($professional['name_extension'])): ?>
+                                , <?= htmlspecialchars($professional['name_extension']) ?>
+                            <?php endif; ?>
+                        </p>
                         <p class="text-gray-600">Specialization: <?= htmlspecialchars($professional['specialization'] ?? 'No Specialization') ?></p>
                         <p class="text-gray-600">Consultation Fee: <?= htmlspecialchars($professional['consultationFee'] ?? '0') ?></p>
                         
@@ -163,6 +168,11 @@ $isAvailable = $doctorAvailability ? $doctorAvailability['is_available'] : 0;
                 <div class="mb-4">
                     <label class="block text-gray-700">Full Name</label>
                     <input type="text" name="fname" value="<?= htmlspecialchars($professional['fname']) ?>" class="w-full p-2 border rounded" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Name Extension (e.g., MD, PhD)</label>
+                    <input type="text" name="name_extension" value="<?= htmlspecialchars($professional['name_extension']) ?>"
+                        class="mt-1 p-2 block w-full border rounded-md shadow-sm" />
                 </div>
                 <div class="mb-4">
                     <label class="block text-gray-700">Last Name</label>

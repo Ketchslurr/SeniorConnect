@@ -73,7 +73,7 @@ foreach ($appointments as $row) {
         <p><strong>Service:</strong> <span id="modalService"></span></p>
         <p><strong>Time:</strong> <span id="modalTime"></span></p>
         <p><strong>Date:</strong> <span id="modalDate"></span></p>
-        <p><strong>Google Meet:</strong> <a id="meetLink" href="#" target="_blank" class="text-blue-600 underline">Join Meeting</a></p>
+        <p><strong>Meeting:</strong> <a id="meetLink" href="#" target="_blank" class="text-blue-600 underline">Join Meeting</a></p>
         <button onclick="closeModal()" class="mt-4 px-4 py-2 bg-red-600 text-white rounded">Close</button>
     </div>
 </div>

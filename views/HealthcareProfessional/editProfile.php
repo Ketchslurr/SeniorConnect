@@ -6,7 +6,6 @@ if (!isset($_SESSION['userId'])) {
     header("Location: ../login.php");
     exit();
 }
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $userId = $_POST['userId'];
     $fname = $_POST['fname'];
@@ -14,12 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
     $consultationFee = $_POST['consultationFee'];
     $specialization = $_POST['specialization'];
-
-//     echo "<pre>";
-// print_r($_POST);
-// print_r($_FILES);
-// echo "</pre>";
-// exit();
+    $name_extension = $_POST['name_extension'];  // Add this to handle the name extension
 
     // Handle profile picture upload
     $profile_picture = null;
@@ -33,11 +27,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Prepare SQL query
         if ($profile_picture !== null) {
-            $sql = "UPDATE healthcareprofessional SET fname = :fname, lname = :lname, doctorEmail = :email, specialization = :specialization, profile_picture = :profile_picture, consultationFee = :consultationFee WHERE userId = :userId";
+            $sql = "UPDATE healthcareprofessional SET fname = :fname, lname = :lname, doctorEmail = :email, specialization = :specialization, profile_picture = :profile_picture, consultationFee = :consultationFee, name_extension = :name_extension WHERE userId = :userId";
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(':profile_picture', $profile_picture, PDO::PARAM_LOB);
         } else {
-            $sql = "UPDATE healthcareprofessional SET fname = :fname, lname = :lname, doctorEmail = :email, specialization = :specialization, consultationFee = :consultationFee WHERE userId = :userId";
+            $sql = "UPDATE healthcareprofessional SET fname = :fname, lname = :lname, doctorEmail = :email, specialization = :specialization, consultationFee = :consultationFee, name_extension = :name_extension WHERE userId = :userId";
             $stmt = $pdo->prepare($sql);
         }
 
@@ -47,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':specialization', $specialization);
         $stmt->bindParam(':consultationFee', $consultationFee);
+        $stmt->bindParam(':name_extension', $name_extension);  // Bind name_extension
         $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
 
         if ($stmt->execute()) {
@@ -62,4 +57,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo "Error updating profile: " . $e->getMessage();
     }
 }
+
 ?>

@@ -7,15 +7,20 @@ if (!isset($_SESSION['userId'])) {
     exit();
 }
 
-// Fetch payments with receipts
-$stmt = $pdo->prepare("SELECT p.paymentId, s.service_name, CONCAT(sc.fName, ' ', sc.lName) AS senior_name, 
-                              p.amount, p.status, p.receipt, p.paymentDate 
+$professionalId = $_SESSION['professionalId'];
+
+// Fetch only payments with receipts for the logged-in doctor
+$stmt = $pdo->prepare("SELECT p.paymentId, CONCAT(sc.fName, ' ', sc.lName) AS senior_name, 
+                              hp.consultationFee AS consultation_fee, p.amount, p.status, p.receipt, p.paymentDate 
                        FROM payments p 
-                       JOIN services s ON p.serviceId = s.serviceId 
                        JOIN seniorcitizen sc ON p.seniorId = sc.seniorId
-                       
+                       JOIN healthcareprofessional hp ON p.professionalId = hp.professionalId
+                       WHERE p.receipt IS NOT NULL 
+                         AND p.receipt != '' 
+                         AND p.professionalId = ?
                        ORDER BY p.paymentDate DESC");
-$stmt->execute();
+$stmt->execute([$professionalId]);
+
 $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -41,8 +46,8 @@ $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <thead class="bg-blue-500 text-white">
                         <tr>
                             <th class="py-2 px-4">Senior Name</th>
-                            <th class="py-2 px-4">Service</th>
-                            <th class="py-2 px-4">Amount</th>
+                            <th class="py-2 px-4">Consultation Fee</th>
+                            <!-- <th class="py-2 px-4">Amount</th> -->
                             <th class="py-2 px-4">Status</th>
                             <th class="py-2 px-4">Receipt</th>
                             <th class="py-2 px-4">Date</th>
@@ -52,8 +57,9 @@ $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <?php foreach ($payments as $payment): ?>
                             <tr class="border-b">
                                 <td class="py-2 px-4"><?= htmlspecialchars($payment['senior_name']); ?></td>
-                                <td class="py-2 px-4"><?= htmlspecialchars($payment['service_name']); ?></td>
-                                <td class="py-2 px-4">₱<?= htmlspecialchars(number_format($payment['amount'], 2)); ?></td>
+                                <!-- <td class="py-2 px-4"><//?= htmlspecialchars($payment['service_name']); ?></td> RHCM 4/5/2025 commented out as I changed service into consultation--> 
+                                <td class="py-2 px-4">₱<?= htmlspecialchars(number_format($payment['consultation_fee'], 2)); ?></td>
+                                <!-- <td class="py-2 px-4">₱<//?= htmlspecialchars(number_format($payment['amount'], 2)); ?></td> -->
                                 <td class="py-2 px-4 text-<?= $payment['status'] == 'verified' ? 'green' : 'red' ?>-500">
                                     <?= htmlspecialchars(ucfirst($payment['status'])); ?>
                                 </td>

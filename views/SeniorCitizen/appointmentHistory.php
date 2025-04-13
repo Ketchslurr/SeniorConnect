@@ -58,9 +58,10 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <th class="p-3 border">Time</th>
                         <th class="p-3 border">Service</th>
                         <th class="p-3 border">Doctor</th>
-                        <th class="p-3 border">Status</th>
+                        <th class="p-3 border">Appointment Status</th>
                         <th class="p-3 border">Doctor's Response</th>
                         <th class="p-3 border">Meeting Link</th>
+                        <th class="p-3 border">Senior Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -91,6 +92,24 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <?php else: ?>
                                         <span class="text-gray-500">No Link</span>
                                     <?php endif; ?>
+                                </td>
+                                <td class="p-3 border">
+                                    <?php
+                                        if ($appointment['appointment_status'] == 'Confirmed') {
+                                            $appointmentDateTime = strtotime($appointment['appointment_date'] . ' ' . $appointment['appointment_time']);
+                                            $now = time();
+
+                                            if ($appointmentDateTime > $now) {
+                                                echo '<span class="text-blue-500 font-medium">Upcoming</span>';
+                                            } elseif (!empty($appointment['meeting_link'])) {
+                                                echo '<span class="text-green-600 font-semibold">Attended</span>';
+                                            } else {
+                                                echo '<span class="text-gray-600 font-semibold">Missed</span>';
+                                            }
+                                        } else {
+                                            echo '<span class="text-gray-400">N/A</span>';
+                                        }
+                                    ?>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

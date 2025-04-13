@@ -12,9 +12,8 @@ $seniorId = $_SESSION['userId'];
 
 // Fetch billing transactions
 $billingStmt = $pdo->prepare("
-    SELECT p.*, s.service_name 
+    SELECT p.*
     FROM payments p
-    JOIN services s ON p.serviceId = s.serviceId
     WHERE p.seniorId = :seniorId
     ORDER BY p.paymentDate DESC
 ");
@@ -48,7 +47,7 @@ $transactions = $billingStmt->fetchAll(PDO::FETCH_ASSOC);
                         <table class="w-full border-collapse border border-gray-200">
                             <thead>
                                 <tr class="bg-gray-200">
-                                    <th class="border p-3 text-left">Service</th>
+                                    <th class="border p-3 text-left">Payment ID</th>
                                     <th class="border p-3 text-left">Amount</th>
                                     <th class="border p-3 text-left">Status</th>
                                     <th class="border p-3 text-left">Receipt</th>
@@ -58,7 +57,7 @@ $transactions = $billingStmt->fetchAll(PDO::FETCH_ASSOC);
                             <tbody>
                                 <?php foreach ($transactions as $transaction): ?>
                                     <tr class="border-b">
-                                        <td class="p-3"><?php echo htmlspecialchars($transaction['service_name']); ?></td>
+                                        <td class="p-3"><?php echo htmlspecialchars($transaction['paymentId']); ?></td>
                                         <td class="p-3">₱<?php echo number_format($transaction['amount'], 2); ?></td>
                                         <td class="p-3">
                                             <?php if (!empty($transaction['receipt']) && file_exists("../../assets/uploads/payments/" . $transaction['receipt'])): ?>
