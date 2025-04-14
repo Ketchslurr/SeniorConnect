@@ -115,11 +115,11 @@ setInterval(() => {
 // echo json_encode($heartRates);
 
 session_start();
-require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../config.php'; 
+require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../config.php'; 
 
 if (!isset($_SESSION['access_token'])) {
-    header("Location: /api/login-google-fit.php");
+    header("Location: ../login-google-fit.php");
     exit;
 }
 

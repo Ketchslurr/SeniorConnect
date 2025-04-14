@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../config.php'; // adjust if your DB connection is named differently
+require_once __DIR__ . '/../config.php'; // DB connection
 
 $client = new Google_Client();
 $client->setAuthConfig(__DIR__ . '/client_secret_559478248256-kun11kga64ut761f2hq0jq65o14mqhtb.apps.googleusercontent.com.json');
@@ -11,26 +11,39 @@ $client->addScope([
     'https://www.googleapis.com/auth/fitness.body.read'
 ]);
 $client->setAccessType('offline');
-$client->setRedirectUri('http://localhost/Senior_Connect/api/oauth-callback.php');
+// $client->setRedirectUri('http://localhost/Senior_Connect/api/oauth-callback.php');
+$client->setRedirectUri('https://senior-production-f9d8.up.railway.app/api/oauth-callback.php');
 
-// Exchange code for token
-$client->authenticate($_GET['code']);
-$tokens = $client->getAccessToken();
-$refreshToken = $client->getRefreshToken();
 
-$_SESSION['access_token'] = $tokens;
-
-// Save tokens to DB
-$userId = $_SESSION['user_id']; // Make sure this was set before login flow
+// Check if code is set
+if (!isset($_GET['code'])) {
+    exit('Authorization code not provided.');
+}
 
 try {
-    $pdo = new PDO($dsn, $username, $password); // Or use your db.php config
+    $client->authenticate($_GET['code']);
+    $tokens = $client->getAccessToken();
 
-    $stmt = $pdo->prepare("UPDATE users SET 
+    if (!$tokens || !isset($tokens['access_token'], $tokens['expires_in'])) {
+        throw new Exception('Failed to retrieve valid access token.');
+    }
+
+    $refreshToken = $client->getRefreshToken();
+    $_SESSION['access_token'] = $tokens;
+
+    // Check for logged-in user
+    if (!isset($_SESSION['userId'])) {
+        throw new Exception('User session not found.');
+    }
+
+    $userId = $_SESSION['userId'];
+
+    // Double check your actual column name (e.g. userId or uid)
+    $stmt = $pdo->prepare("UPDATE user_info SET 
         google_fit_access_token = ?, 
         google_fit_refresh_token = ?, 
         google_fit_token_expires = ? 
-        WHERE id = ?");
+        WHERE userId = ?"); // Change 'userId' to the correct column in your DB
     $stmt->execute([
         $tokens['access_token'],
         $refreshToken,
@@ -38,11 +51,65 @@ try {
         $userId
     ]);
 
-    header('Location: /googleFit/real-time-heart-rate.php');
+    header('Location: ../views/SeniorCitizen/realTimeMonitoring.php');
     exit;
-} catch (PDOException $e) {
-    echo "DB Error: " . $e->getMessage();
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
 }
+
+// session_start();
+// require_once __DIR__ . '/../vendor/autoload.php';
+// require_once __DIR__ . '/../config.php'; // Include your DB connection config
+
+// $client = new Google_Client();
+// $client->setAuthConfig(__DIR__ . '/client_secret_559478248256-kun11kga64ut761f2hq0jq65o14mqhtb.apps.googleusercontent.com.json');
+// $client->addScope([
+//     'https://www.googleapis.com/auth/fitness.heart_rate.read',
+//     'https://www.googleapis.com/auth/fitness.activity.read',
+//     'https://www.googleapis.com/auth/fitness.body.read'
+// ]);
+// $client->setAccessType('offline');
+// $client->setRedirectUri('http://localhost/Senior_Connect/api/oauth-callback.php');
+
+// if (!isset($_GET['code'])) {
+//     exit('Authorization code not provided.');
+// }
+
+// try {
+//     // Exchange code for access token
+//     $client->authenticate($_GET['code']);
+//     $tokens = $client->getAccessToken();
+//     $refreshToken = $client->getRefreshToken();
+
+//     $_SESSION['access_token'] = $tokens;
+
+//     // Validate user session
+//     if (!isset($_SESSION['userId'])) {
+//         exit('User session not found.');
+//     }
+
+//     $userId = $_SESSION['userId'];
+
+//     // Save tokens to DB using $pdo from config.php
+//     $stmt = $pdo->prepare("UPDATE user_info SET 
+//         google_fit_access_token = ?, 
+//         google_fit_refresh_token = ?, 
+//         google_fit_token_expires = ? 
+//         WHERE userId = ?");
+//     $stmt->execute([
+//         $tokens['access_token'],
+//         $refreshToken,
+//         time() + $tokens['expires_in'],
+//         $userId
+//     ]);
+
+//     // Redirect to dashboard or desired screen
+//     header('Location: /googleFit/real-time-heart-rate.php');
+//     exit;
+// } catch (Exception $e) {
+//     echo "Error: " . $e->getMessage();
+// }
+
 
 // session_start();
 // require_once __DIR__ . '/../vendor/autoload.php';

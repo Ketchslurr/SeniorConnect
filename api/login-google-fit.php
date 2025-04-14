@@ -1,6 +1,7 @@
 <?php
 $client_id = '559478248256-kun11kga64ut761f2hq0jq65o14mqhtb.apps.googleusercontent.com';
-$redirect_uri = 'http://localhost/Senior_Connect/api/oauth-callback.php';
+// $redirect_uri = 'http://localhost/Senior_Connect/api/oauth-callback.php';
+$redirect_uri = 'https://senior-production-f9d8.up.railway.app/api/oauth-callback.php';
 
 $scope = 'https://www.googleapis.com/auth/fitness.heart_rate.read https://www.googleapis.com/auth/fitness.activity.read https://www.googleapis.com/auth/fitness.body.read';
 

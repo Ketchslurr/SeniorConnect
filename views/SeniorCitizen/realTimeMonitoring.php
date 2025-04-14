@@ -3,8 +3,20 @@ include '../../config.php';
 
 // Ensure user is logged in
 session_start();
-if (!isset($_SESSION['seniorId'])) {
+if (!isset($_SESSION['userId'])) {
     header("Location: login.php");
+    exit();
+}
+
+// Check if Google Fit token is saved
+$userId = $_SESSION['userId'];
+$stmt = $pdo->prepare("SELECT google_fit_access_token, google_fit_refresh_token FROM user_info WHERE userId = ?");
+$stmt->execute([$userId]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$user || empty($user['google_fit_access_token']) || empty($user['google_fit_refresh_token'])) {
+    // Redirect to OAuth flow
+    header("Location: ../../api/login-google-fit.php");
     exit();
 }
 ?>

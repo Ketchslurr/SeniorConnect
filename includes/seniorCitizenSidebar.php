@@ -73,10 +73,10 @@
                 <!-- <a href="../SeniorCitizen/library.php" class="block text-gray-600 hover:text-blue-500">🎥 Purchased Videos</a> -->
             </div>
         </div>
-
+<!-- 
         <a href="#" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
             <span>⚙️</span><span>Settings</span>
-        </a>
+        </a> -->
         <a href="../SeniorCitizen/realTimeMonitoring.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
             <span>📡</span><span>Real Time Monitoring</span>
         </a>
