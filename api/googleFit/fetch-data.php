@@ -9,8 +9,6 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/../../config.php'; 
 header('Content-Type: application/json');
 
-$now = round(microtime(true) * 1000);
-$tenMinsAgo = $now - (10 * 60 * 1000);
 
 if (!isset($_SESSION['access_token'])) {
     // header("Location: ../login-google-fit.php");
@@ -56,15 +54,21 @@ if ($client->isAccessTokenExpired()) {
     ]);
 }
 
+$now = round(microtime(true) * 1000);
+$tenMinsAgo = $now - (10 * 60 * 1000);
+
 $body = [
     "aggregateBy" => [
         ["dataTypeName" => "com.google.heart_rate.bpm"],
         ["dataTypeName" => "com.google.step_count.delta"],
         ["dataTypeName" => "com.google.calories.expended"],
     ],
+    // "bucketByTime" => ["durationMillis" => 60000], // 1 minute
+    // "startTimeMillis" => intval($tenMinsAgo / 1000000),
+    // "endTimeMillis" => intval($now / 1000000)
     "bucketByTime" => ["durationMillis" => 60000], // 1 minute
-    "startTimeMillis" => intval($tenMinsAgo / 1000000),
-    "endTimeMillis" => intval($now / 1000000)
+    "startTimeMillis" => $tenMinsAgo,
+    "endTimeMillis" => $now
 ];
 
 $http = new \GuzzleHttp\Client();
@@ -81,29 +85,62 @@ $response = $http->post($url, [
 $data = json_decode($response->getBody(), true);
 $results = [];
 
+// foreach ($data['bucket'] as $bucket) {
+//     $time = intval($bucket['startTimeMillis']);
+//     $entry = ['time' => $time];
+
+//     foreach ($bucket['dataset'] as $dataset) {
+//         $type = $dataset['dataSourceId'] ?? '';
+//         if (!empty($dataset['point'])) {
+//             $point = $dataset['point'][0];
+//             $value = $point['value'][0];
+//             switch ($point['dataTypeName']) {
+//                 case 'com.google.heart_rate.bpm':
+//                     $entry['bpm'] = $value['fpVal'];
+//                     break;
+//                 case 'com.google.step_count.delta':
+//                     $entry['steps'] = $value['intVal'];
+//                     break;
+//                 case 'com.google.calories.expended':
+//                     $entry['calories'] = $value['fpVal'];
+//                     break;
+//             }
+//         }
+//     }
+//     $results[] = $entry;
+// }
+
 foreach ($data['bucket'] as $bucket) {
     $time = intval($bucket['startTimeMillis']);
-    $entry = ['time' => $time];
+    $entry = ['time' => $time]; // initialize empty entry
 
     foreach ($bucket['dataset'] as $dataset) {
-        $type = $dataset['dataSourceId'] ?? '';
         if (!empty($dataset['point'])) {
-            $point = $dataset['point'][0];
-            $value = $point['value'][0];
-            switch ($point['dataTypeName']) {
-                case 'com.google.heart_rate.bpm':
-                    $entry['bpm'] = $value['fpVal'];
-                    break;
-                case 'com.google.step_count.delta':
-                    $entry['steps'] = $value['intVal'];
-                    break;
-                case 'com.google.calories.expended':
-                    $entry['calories'] = $value['fpVal'];
-                    break;
+            foreach ($dataset['point'] as $point) {
+                $dataType = $point['dataTypeName'];
+                $value = $point['value'][0] ?? null;
+
+                if (!$value) continue;
+
+                switch ($dataType) {
+                    case 'com.google.heart_rate.bpm':
+                        $entry['bpm'] = $value['fpVal'] ?? null;
+                        break;
+                    case 'com.google.step_count.delta':
+                        $entry['steps'] = $value['intVal'] ?? 0;
+                        break;
+                    case 'com.google.calories.expended':
+                        $entry['calories'] = $value['fpVal'] ?? 0.0;
+                        break;
+                }
             }
         }
     }
-    $results[] = $entry;
+
+    // only include entry if at least one metric is present
+    if (isset($entry['bpm']) || isset($entry['steps']) || isset($entry['calories'])) {
+        $results[] = $entry;
+    }
 }
 
 echo json_encode($results);
