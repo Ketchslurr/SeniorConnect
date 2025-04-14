@@ -185,7 +185,7 @@ if (!$user || empty($user['google_fit_access_token']) || empty($user['google_fit
 
         const times = data.map(dp => new Date(dp.time));
         heartChart.data.labels = stepsChart.data.labels = caloriesChart.data.labels = times;
-        heartChart.data.datasets[0].data = data.map(dp => dp.bpm ?? null);
+        heartChart.data.datasets[0].data = data.map(dp => dp.bpm ?? 0);
         stepsChart.data.datasets[0].data = data.map(dp => dp.steps ?? 0);
         caloriesChart.data.datasets[0].data = data.map(dp => dp.calories ?? 0);
 
