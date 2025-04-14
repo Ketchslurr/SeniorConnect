@@ -55,6 +55,9 @@ $body = [
     "endTimeMillis" => intval($now / 1000000)
 ];
 
+$http = new \GuzzleHttp\Client();
+$url = 'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate';
+
 $response = $http->post($url, [
     'headers' => [
         'Authorization' => 'Bearer ' . $client->getAccessToken()['access_token'],
