@@ -138,8 +138,19 @@ if (!$user || empty($user['google_fit_access_token']) || empty($user['google_fit
                     }
                 }
 
-                const data = await res.json();
-
+                // const data = await res.json();
+                const data = await res.json().catch(err => {
+                    throw new Error("Invalid JSON response");
+                });
+                if (!res.ok) {
+                    const text = await res.text(); // Read raw response
+                    console.error("Full API error response:", text);
+                    if (res.status === 401) {
+                        window.location.href = '/api/login-google-fit.php';
+                    } else {
+                        throw new Error("API error: " + res.status);
+                    }
+                }
                 const times = data.map(dp => new Date(dp.time));
                 heartChart.data.labels = stepsChart.data.labels = caloriesChart.data.labels = times;
                 heartChart.data.datasets[0].data = data.map(dp => dp.bpm ?? null);

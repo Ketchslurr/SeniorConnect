@@ -28,7 +28,7 @@ $stmt->execute([$userId]);
 $tokens = $stmt->fetch(PDO::FETCH_ASSOC);
 
 $client = new Google_Client();
-$client->setAuthConfig(__DIR__ . '/client_secret_559478248256-kun11kga64ut761f2hq0jq65o14mqhtb.apps.googleusercontent.com.json');
+$client->setAuthConfig(__DIR__ . '/../client_secret_559478248256-kun11kga64ut761f2hq0jq65o14mqhtb.apps.googleusercontent.com.json');
 $client->addScope('https://www.googleapis.com/auth/fitness.heart_rate.read');
 $client->setAccessType('offline');
 
