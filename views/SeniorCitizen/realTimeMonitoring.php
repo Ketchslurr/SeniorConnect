@@ -63,7 +63,7 @@ if (!$user || empty($user['google_fit_access_token']) || empty($user['google_fit
         </button>
         </div>
 
-        <pre id="result" class="bg-white p-2 text-sm text-gray-800 overflow-x-auto rounded shadow"></pre>
+        <!-- <pre id="result" class="bg-white p-2 text-sm text-gray-800 overflow-x-auto rounded shadow"></pre> -->
                 
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
