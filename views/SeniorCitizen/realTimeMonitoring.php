@@ -107,17 +107,44 @@ if (!$user || empty($user['google_fit_access_token']) || empty($user['google_fit
         const stepsChart = makeChart('stepsChart', 'Steps', 'rgb(37, 99, 235)');
         const caloriesChart = makeChart('caloriesChart', 'Calories', 'rgb(34, 197, 94)');
 
+        // async function fetchData() {
+        //     try {
+        //         const res = await fetch('/api/googleFit/fetch-data.php');
+        //         const data = await res.json();
+
+        //         const times = data.map(dp => new Date(dp.time));
+
+        //         heartChart.data.labels = stepsChart.data.labels = caloriesChart.data.labels = times;
+        //         heartChart.data.datasets[0].data = data.map(dp => dp.bpm || null);
+        //         stepsChart.data.datasets[0].data = data.map(dp => dp.steps || 0);
+        //         caloriesChart.data.datasets[0].data = data.map(dp => dp.calories || 0);
+
+        //         heartChart.update();
+        //         stepsChart.update();
+        //         caloriesChart.update();
+        //     } catch (error) {
+        //         console.error('Failed to fetch data:', error);
+        //     }
+        // }
         async function fetchData() {
             try {
                 const res = await fetch('/api/googleFit/fetch-data.php');
+                if (!res.ok) {
+                    if (res.status === 401) {
+                        // Redirect to Google login (trigger OAuth flow)
+                        window.location.href = '/api/login-google-fit.php';
+                    } else {
+                        throw new Error("API error: " + res.status);
+                    }
+                }
+
                 const data = await res.json();
 
                 const times = data.map(dp => new Date(dp.time));
-
                 heartChart.data.labels = stepsChart.data.labels = caloriesChart.data.labels = times;
-                heartChart.data.datasets[0].data = data.map(dp => dp.bpm || null);
-                stepsChart.data.datasets[0].data = data.map(dp => dp.steps || 0);
-                caloriesChart.data.datasets[0].data = data.map(dp => dp.calories || 0);
+                heartChart.data.datasets[0].data = data.map(dp => dp.bpm ?? null);
+                stepsChart.data.datasets[0].data = data.map(dp => dp.steps ?? 0);
+                caloriesChart.data.datasets[0].data = data.map(dp => dp.calories ?? 0);
 
                 heartChart.update();
                 stepsChart.update();
@@ -126,6 +153,7 @@ if (!$user || empty($user['google_fit_access_token']) || empty($user['google_fit
                 console.error('Failed to fetch data:', error);
             }
         }
+
 
         fetchData();
         setInterval(fetchData, 10000); // every 10 seconds

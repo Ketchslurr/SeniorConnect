@@ -4,7 +4,10 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/../../config.php'; 
 
 if (!isset($_SESSION['access_token'])) {
-    header("Location: ../login-google-fit.php");
+    // header("Location: ../login-google-fit.php");
+    // exit;
+    http_response_code(401);
+    echo json_encode(['error' => 'Not authenticated']);
     exit;
 }
 
