@@ -47,33 +47,24 @@ if (!$user || empty($user['google_fit_access_token']) || empty($user['google_fit
         <!-- Main Content -->
         <div class="flex-1 p-6">
             <h2 class="text-2xl font-semibold text-gray-700 mb-6">📊 Real-Time Health Monitoring</h2>
-            <label for="filter">Select Time Filter:</label>
-                <select id="filter">
-                <option value="10min">Last 10 Minutes</option>
-                <option value="1h">Last 1 Hour</option>
-                <option value="24h">Last 24 Hours</option>
-                <option value="7d">Last 7 Days</option>
-                <option value="30d">Last 30 Days</option>
-                </select>
+            <!-- Time Filter and Button -->
+        <div class="mb-4">
+        <label for="filter" class="block mb-1 font-medium text-gray-700">Select Time Filter:</label>
+        <select id="filter" class="border border-gray-300 rounded px-3 py-1">
+            <option value="10min">Last 10 Minutes</option>
+            <option value="1h">Last 1 Hour</option>
+            <option value="24h">Last 24 Hours</option>
+            <option value="7d">Last 7 Days</option>
+            <option value="30d">Last 30 Days</option>
+        </select>
 
-                <button onclick="fetchData()">Fetch Data</button>
+        <button onclick="fetchData()" class="ml-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded">
+            Fetch Data
+        </button>
+        </div>
 
-                <pre id="result"></pre>
-
-                <script>
-                async function fetchData() {
-                    const filter = document.getElementById('filter').value;
-
-                    try {
-                    const response = await fetch(`/api/googleFit/fetch-data.php?filter=${filter}`);
-                    const data = await response.json();
-                    document.getElementById('result').textContent = JSON.stringify(data, null, 2);
-                    } catch (error) {
-                    document.getElementById('result').textContent = 'Error fetching data.';
-                    console.error(error);
-                    }
-                }
-                </script>
+        <pre id="result" class="bg-white p-2 text-sm text-gray-800 overflow-x-auto rounded shadow"></pre>
+                
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Heart Rate Chart -->
@@ -133,18 +124,37 @@ if (!$user || empty($user['google_fit_access_token']) || empty($user['google_fit
         const heartChart = makeChart('heartChart', 'Heart Rate', 'rgb(239, 68, 68)');
         const stepsChart = makeChart('stepsChart', 'Steps', 'rgb(37, 99, 235)');
         const caloriesChart = makeChart('caloriesChart', 'Calories', 'rgb(34, 197, 94)');
-
+        
         // async function fetchData() {
         //     try {
         //         const res = await fetch('/api/googleFit/fetch-data.php');
-        //         const data = await res.json();
+        //         if (!res.ok) {
+        //             if (res.status === 401) {
+        //                 // Redirect to Google login (trigger OAuth flow)
+        //                 window.location.href = '/api/login-google-fit.php';
+        //             } else {
+        //                 throw new Error("API error: " + res.status);
+        //             }
+        //         }
 
+        //         // const data = await res.json();
+        //         const data = await res.json().catch(err => {
+        //             throw new Error("Invalid JSON response");
+        //         });
+        //         if (!res.ok) {
+        //             const text = await res.text(); // Read raw response
+        //             console.error("Full API error response:", text);
+        //             if (res.status === 401) {
+        //                 window.location.href = '/api/login-google-fit.php';
+        //             } else {
+        //                 throw new Error("API error: " + res.status);
+        //             }
+        //         }
         //         const times = data.map(dp => new Date(dp.time));
-
         //         heartChart.data.labels = stepsChart.data.labels = caloriesChart.data.labels = times;
-        //         heartChart.data.datasets[0].data = data.map(dp => dp.bpm || null);
-        //         stepsChart.data.datasets[0].data = data.map(dp => dp.steps || 0);
-        //         caloriesChart.data.datasets[0].data = data.map(dp => dp.calories || 0);
+        //         heartChart.data.datasets[0].data = data.map(dp => dp.bpm ?? null);
+        //         stepsChart.data.datasets[0].data = data.map(dp => dp.steps ?? 0);
+        //         caloriesChart.data.datasets[0].data = data.map(dp => dp.calories ?? 0);
 
         //         heartChart.update();
         //         stepsChart.update();
@@ -154,47 +164,46 @@ if (!$user || empty($user['google_fit_access_token']) || empty($user['google_fit
         //     }
         // }
         async function fetchData() {
-            try {
-                const res = await fetch('/api/googleFit/fetch-data.php');
-                if (!res.ok) {
-                    if (res.status === 401) {
-                        // Redirect to Google login (trigger OAuth flow)
-                        window.location.href = '/api/login-google-fit.php';
-                    } else {
-                        throw new Error("API error: " + res.status);
-                    }
-                }
+    const filter = document.getElementById('filter').value;
 
-                // const data = await res.json();
-                const data = await res.json().catch(err => {
-                    throw new Error("Invalid JSON response");
-                });
-                if (!res.ok) {
-                    const text = await res.text(); // Read raw response
-                    console.error("Full API error response:", text);
-                    if (res.status === 401) {
-                        window.location.href = '/api/login-google-fit.php';
-                    } else {
-                        throw new Error("API error: " + res.status);
-                    }
-                }
-                const times = data.map(dp => new Date(dp.time));
-                heartChart.data.labels = stepsChart.data.labels = caloriesChart.data.labels = times;
-                heartChart.data.datasets[0].data = data.map(dp => dp.bpm ?? null);
-                stepsChart.data.datasets[0].data = data.map(dp => dp.steps ?? 0);
-                caloriesChart.data.datasets[0].data = data.map(dp => dp.calories ?? 0);
-
-                heartChart.update();
-                stepsChart.update();
-                caloriesChart.update();
-            } catch (error) {
-                console.error('Failed to fetch data:', error);
+    try {
+        const res = await fetch(`/api/googleFit/fetch-data.php?filter=${filter}`);
+        if (!res.ok) {
+            if (res.status === 401) {
+                window.location.href = '/api/login-google-fit.php';
+                return;
+            } else {
+                throw new Error("API error: " + res.status);
             }
         }
 
+        const data = await res.json().catch(() => {
+            throw new Error("Invalid JSON response");
+        });
 
-        fetchData();
-        setInterval(fetchData, 10000); // every 10 seconds
+        document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+
+        const times = data.map(dp => new Date(dp.time));
+        heartChart.data.labels = stepsChart.data.labels = caloriesChart.data.labels = times;
+        heartChart.data.datasets[0].data = data.map(dp => dp.bpm ?? null);
+        stepsChart.data.datasets[0].data = data.map(dp => dp.steps ?? 0);
+        caloriesChart.data.datasets[0].data = data.map(dp => dp.calories ?? 0);
+
+        heartChart.update();
+        stepsChart.update();
+        caloriesChart.update();
+    } catch (error) {
+        document.getElementById('result').textContent = 'Error fetching data.';
+        console.error('Fetch error:', error);
+    }
+}
+
+setInterval(() => {
+    fetchData();
+}, 10000);
+
+        // fetchData();
+        // setInterval(fetchData, 10000); // every 10 seconds
     </script>
 
 </body>
