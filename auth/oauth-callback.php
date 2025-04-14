@@ -23,7 +23,7 @@ if (isset($_GET['code'])) {
     if (isset($token['error'])) {
         throw new Exception("Token error: " . json_encode($token));
     }
-    echo "<pre>"; print_r($token); echo "</pre>"; 
+    // echo "<pre>"; print_r($token); echo "</pre>"; 
     // exit();
 
     if (!isset($token['error'])) {
