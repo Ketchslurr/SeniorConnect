@@ -44,7 +44,7 @@ if (isset($_GET['code'])) {
 
         if ($user) {
             $_SESSION['userId'] = $user['userId'];
-            $_SESSION['username'] = $user['Username'];
+            // $_SESSION['username'] = $user['Username'];
             $_SESSION['fname'] = $user['fname'];
             $_SESSION['role'] = $user['roleId'];
 
@@ -63,11 +63,11 @@ if (isset($_GET['code'])) {
             }
         } else {
             // Insert new user without a role
-            $stmt = $pdo->prepare("INSERT INTO user_info (Username, fName, email, roleId) VALUES (?, ?, ?, NULL)");
+            $stmt = $pdo->prepare("INSERT INTO user_info (fName, email, roleId) VALUES ( ?, ?, NULL)");
             $stmt->execute([$fullName, $fullName, $email]);
 
             $_SESSION['userId'] = $pdo->lastInsertId();
-            $_SESSION['username'] = $fullName;
+            // $_SESSION['username'] = $fullName;
             $_SESSION['fName'] = $fullName;
             $_SESSION['role'] = null;
             $_SESSION['googleName'] = $fullName;
