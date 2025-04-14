@@ -54,8 +54,9 @@ if ($client->isAccessTokenExpired()) {
     ]);
 }
 
-$now = round(microtime(true) * 1000);
-$tenMinsAgo = $now - (10 * 60 * 1000);
+$now = round(microtime(true) * 1000); // current time in ms
+// $tenMinsAgo = $now - (10 * 60 * 1000); // 10 minutes ago
+$yesterday = $now - (24 * 60 * 60 * 1000); 
 
 $body = [
     "aggregateBy" => [
@@ -67,8 +68,8 @@ $body = [
     // "startTimeMillis" => intval($tenMinsAgo / 1000000),
     // "endTimeMillis" => intval($now / 1000000)
     "bucketByTime" => ["durationMillis" => 60000], // 1 minute
-    "startTimeMillis" => $tenMinsAgo,
-    "endTimeMillis" => $now
+    "startTimeMillis" => $yesterday,
+"endTimeMillis" => $now
 ];
 
 $http = new \GuzzleHttp\Client();
@@ -109,38 +110,81 @@ $results = [];
 //     }
 //     $results[] = $entry;
 // }
+// --------------------------------------------------------------------------------------------
+// foreach ($data['bucket'] as $bucket) {
+//     $time = intval($bucket['startTimeMillis']);
+//     $entry = ['time' => $time]; // initialize empty entry
 
+//     foreach ($bucket['dataset'] as $dataset) {
+//         if (!empty($dataset['point'])) {
+//             foreach ($dataset['point'] as $point) {
+//                 $dataType = $point['dataTypeName'];
+//                 $value = $point['value'][0] ?? null;
+
+//                 if (!$value) continue;
+
+//                 switch ($dataType) {
+//                     case 'com.google.heart_rate.bpm':
+//                         $entry['bpm'] = $value['fpVal'] ?? null;
+//                         break;
+//                     case 'com.google.step_count.delta':
+//                         $entry['steps'] = $value['intVal'] ?? 0;
+//                         break;
+//                     case 'com.google.calories.expended':
+//                         $entry['calories'] = $value['fpVal'] ?? 0.0;
+//                         break;
+//                 }
+//             }
+//         }
+//     }
+
+//     // only include entry if at least one metric is present
+//     if (isset($entry['bpm']) || isset($entry['steps']) || isset($entry['calories'])) {
+//         $results[] = $entry;
+//     }
+// }
 foreach ($data['bucket'] as $bucket) {
     $time = intval($bucket['startTimeMillis']);
-    $entry = ['time' => $time]; // initialize empty entry
+    $entry = ['time' => $time];
 
     foreach ($bucket['dataset'] as $dataset) {
+        $type = $dataset['dataSourceId'] ?? '';
         if (!empty($dataset['point'])) {
-            foreach ($dataset['point'] as $point) {
-                $dataType = $point['dataTypeName'];
-                $value = $point['value'][0] ?? null;
-
-                if (!$value) continue;
-
-                switch ($dataType) {
-                    case 'com.google.heart_rate.bpm':
-                        $entry['bpm'] = $value['fpVal'] ?? null;
-                        break;
-                    case 'com.google.step_count.delta':
-                        $entry['steps'] = $value['intVal'] ?? 0;
-                        break;
-                    case 'com.google.calories.expended':
-                        $entry['calories'] = $value['fpVal'] ?? 0.0;
-                        break;
-                }
+            $point = $dataset['point'][0];
+            $value = $point['value'][0];
+            switch ($point['dataTypeName']) {
+                case 'com.google.heart_rate.bpm':
+                    $entry['bpm'] = $value['fpVal'];
+                    break;
+                case 'com.google.step_count.delta':
+                    $entry['steps'] = $value['intVal'];
+                    break;
+                case 'com.google.calories.expended':
+                    $entry['calories'] = $value['fpVal'];
+                    break;
             }
         }
     }
 
-    // only include entry if at least one metric is present
-    if (isset($entry['bpm']) || isset($entry['steps']) || isset($entry['calories'])) {
+    // If any data was added
+    if (count($entry) > 1) {
         $results[] = $entry;
     }
 }
+
+// If empty, generate fake data for the past 10 minutes
+if (empty($results)) {
+    for ($i = 9; $i >= 0; $i--) {
+        $timestamp = $now - ($i * 60 * 1000); // 1-minute intervals
+        $results[] = [
+            'time' => $timestamp,
+            'bpm' => rand(60, 100),
+            'steps' => rand(0, 15),
+            'calories' => round(rand(1, 5) + (rand(0, 9) / 10), 1),
+            'fake' => true
+        ];
+    }
+}
+
 
 echo json_encode($results);
