@@ -90,8 +90,11 @@ if ($durationMillis > 24 * 60 * 60 * 1000) {
 
 // Build request body
 $body = [
-    "aggregateBy" => [
-        ["dataTypeName" => "com.google.heart_rate.bpm"],
+   "aggregateBy" => [
+        [
+            "dataTypeName" => "com.google.heart_rate.bpm",
+            "dataSourceId" => "derived:com.google.heart_rate.bpm:com.google.android.gms:merge_heart_rate_bpm"
+        ],
         ["dataTypeName" => "com.google.step_count.delta"],
         ["dataTypeName" => "com.google.calories.expended"],
     ],
