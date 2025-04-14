@@ -1,8 +1,16 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+
 session_start();
 require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/../../config.php'; 
 header('Content-Type: application/json');
+
+$now = round(microtime(true) * 1000);
+$tenMinsAgo = $now - (10 * 60 * 1000);
 
 if (!isset($_SESSION['access_token'])) {
     // header("Location: ../login-google-fit.php");
