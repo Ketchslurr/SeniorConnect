@@ -55,8 +55,8 @@ if ($client->isAccessTokenExpired()) {
 }
 
 $now = round(microtime(true) * 1000); // current time in ms
-// $tenMinsAgo = $now - (10 * 60 * 1000); // 10 minutes ago
-$yesterday = $now - (24 * 60 * 60 * 1000); 
+$tenMinsAgo = $now - (10 * 60 * 1000); // 10 minutes ago
+// $yesterday = $now - (24 * 60 * 60 * 1000); 
 
 $body = [
     "aggregateBy" => [
