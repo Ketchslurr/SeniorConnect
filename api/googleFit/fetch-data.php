@@ -8,10 +8,10 @@ if (!isset($_SESSION['access_token'])) {
     exit;
 }
 
-$userId = $_SESSION['user_id']; // ensure user is logged in
+$userId = $_SESSION['userId']; // ensure user is logged in
 
-$pdo = new PDO($dsn, $username, $password);
-$stmt = $pdo->prepare("SELECT google_fit_access_token, google_fit_refresh_token, google_fit_token_expires FROM user_info WHERE id = ?");
+// $pdo = new PDO($dsn, $username, $password);
+$stmt = $pdo->prepare("SELECT google_fit_access_token, google_fit_refresh_token, google_fit_token_expires FROM user_info WHERE userId = ?");
 $stmt->execute([$userId]);
 $tokens = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -33,10 +33,10 @@ if ($client->isAccessTokenExpired()) {
     $newToken = $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
     $client->setAccessToken($newToken);
 
-    $stmt = $pdo->prepare("UPDATE users SET 
+    $stmt = $pdo->prepare("UPDATE user_info SET 
         google_fit_access_token = ?, 
         google_fit_token_expires = ? 
-        WHERE id = ?");
+        WHERE userId = ?");
     $stmt->execute([
         $newToken['access_token'],
         time() + $newToken['expires_in'],
