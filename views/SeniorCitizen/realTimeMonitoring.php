@@ -47,6 +47,33 @@ if (!$user || empty($user['google_fit_access_token']) || empty($user['google_fit
         <!-- Main Content -->
         <div class="flex-1 p-6">
             <h2 class="text-2xl font-semibold text-gray-700 mb-6">📊 Real-Time Health Monitoring</h2>
+            <label for="filter">Select Time Filter:</label>
+                <select id="filter">
+                <option value="10min">Last 10 Minutes</option>
+                <option value="1h">Last 1 Hour</option>
+                <option value="24h">Last 24 Hours</option>
+                <option value="7d">Last 7 Days</option>
+                <option value="30d">Last 30 Days</option>
+                </select>
+
+                <button onclick="fetchData()">Fetch Data</button>
+
+                <pre id="result"></pre>
+
+                <script>
+                async function fetchData() {
+                    const filter = document.getElementById('filter').value;
+
+                    try {
+                    const response = await fetch(`/api/googleFit/fetch-data.php?filter=${filter}`);
+                    const data = await response.json();
+                    document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+                    } catch (error) {
+                    document.getElementById('result').textContent = 'Error fetching data.';
+                    console.error(error);
+                    }
+                }
+                </script>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Heart Rate Chart -->
