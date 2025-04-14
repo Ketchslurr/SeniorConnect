@@ -65,6 +65,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId']) && is
         'appointmentId' => $appointmentId
     ]);
 
+    
+
     // Fetch the senior ID for the appointment
     $seniorSql = "SELECT seniorId FROM appointment WHERE appointmentId = :appointmentId";
     $seniorStmt = $pdo->prepare($seniorSql);
@@ -80,6 +82,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId']) && is
         // Create notification
         createNotification($pdo, $seniorId, $message);
     }
+    // Send notification
+    // $seniorId = $senior['seniorId'];
+
+    // $notifSql = "INSERT INTO notifications (seniorId, message, link, created_at) 
+    // VALUES (:seniorId, :message, :link, NOW())";
+    // $notifStmt = $pdo->prepare($notifSql);
+    // $notifStmt->execute([
+    // 'seniorId' => $seniorId,
+    // 'message' => 'Your appointment has been confirmed. Please come back 15 mins before the appointed time.',
+    // 'link' => '../SeniorCitizen/notifications.php'
+    // ]);
 
     echo json_encode(['status' => 'success', 'message' => 'Appointment updated successfully']);
     exit();

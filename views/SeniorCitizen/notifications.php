@@ -9,6 +9,11 @@ if (!isset($_SESSION['userId'])) {
 
 $seniorId = $_SESSION['seniorId'];
 
+// Mark all notifications as read
+$updateSql = "UPDATE notifications SET is_read = 1 WHERE seniorId = :seniorId AND is_read = 0";
+$updateStmt = $pdo->prepare($updateSql);
+$updateStmt->execute(['seniorId' => $seniorId]);
+
 // Fetch notifications for this senior
 $sql = "SELECT * FROM notifications WHERE seniorId = :seniorId ORDER BY created_at DESC";
 $stmt = $pdo->prepare($sql);

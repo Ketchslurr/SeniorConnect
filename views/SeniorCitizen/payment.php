@@ -49,6 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['payment_proof'])) {
     if (in_array($fileType, $allowedTypes)) {
         if (move_uploaded_file($_FILES["payment_proof"]["tmp_name"], $targetFilePath)) {
             try {
+                // Insert payment record
                 $stmt = $pdo->prepare("INSERT INTO payments (seniorId, professionalId, amount, status, receipt, paymentDate) 
                                        VALUES (:seniorId, :professionalId, :totalAmount, 'unverified', :payment_proof, NOW())");
                 $stmt->execute([
@@ -57,12 +58,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['payment_proof'])) {
                     ':totalAmount' => $totalAmount,
                     ':payment_proof' => $fileName
                 ]);
+        
+                // Send notification
+                $notifSql = "INSERT INTO notifications (seniorId, message, link, created_at) 
+                             VALUES (:seniorId, :message, :link, NOW())";
+                $notifStmt = $pdo->prepare($notifSql);
+                $notifStmt->execute([
+                    'seniorId' => $seniorId,
+                    'message' => 'Your appointment is now pending verification. Please wait for confirmation.',
+                    'link' => 'notifications.php'
+                ]);
+        
                 echo "<script>localStorage.setItem('showSuccessModal', 'true');</script>";
                 $uploadSuccess = true;
             } catch (PDOException $e) {
                 echo "<script>alert('Database error: " . $e->getMessage() . "');</script>";
             }
-        } else {
+        }else {
             echo "<script>alert('File upload failed, please try again.');</script>";
         }
     } else {

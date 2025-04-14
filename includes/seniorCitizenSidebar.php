@@ -18,6 +18,12 @@
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         $_SESSION['profile_picture'] = $result['profile_picture'] ?? 'default.png'; // Default if null
     }
+    // Count unread notifications
+    $sql = "SELECT COUNT(*) AS unread_count FROM notifications WHERE seniorId = :seniorId AND is_read = 0";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['seniorId' => $seniorId]);
+    $notificationData = $stmt->fetch(PDO::FETCH_ASSOC);
+    $unreadCount = $notificationData['unread_count'];
 
     // Path to the profile picture
     $profilePicture = !empty($_SESSION['profile_picture']) ? "../../uploads/profile_pictures/" . $_SESSION['profile_picture'] : "../../assets/Icons/default.png";
@@ -55,8 +61,17 @@
         <a href="../Forum/forum.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
             <span>📡</span><span>Forum</span>
         </a>
-        <a href="../SeniorCitizen/notifications.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
+        <!-- <a href="../SeniorCitizen/notifications.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
             <span>🔔</span><span>Notifications</span>
+        </a> -->
+        <a href="../SeniorCitizen/notifications.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500 relative">
+            <span>🔔</span>
+            <span>Notifications</span>
+            <?php if ($unreadCount > 0): ?>
+                <span class="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5 transform translate-x-2 -translate-y-1">
+                    +<?php echo $unreadCount; ?>
+                </span>
+            <?php endif; ?>
         </a>
         <a href="../SeniorCitizen/billing.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
             <span>💳</span><span>Billing & Payments</span>
