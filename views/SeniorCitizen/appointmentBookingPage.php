@@ -106,7 +106,7 @@ $services = $stmtServices->fetchAll(PDO::FETCH_ASSOC);
 <div id="confirmationModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 hidden">
     <div class="bg-white rounded-lg p-6 w-96 shadow-lg">
         <h2 class="text-xl font-bold mb-4">Confirm Appointment</h2>
-        <p><strong>Service:</strong> <span id="modalService"></span></p>
+        <!-- <p><strong>Service:</strong> <span id="modalService"></span></p> -->
         <p><strong>Date:</strong> <span id="modalDate"></span></p>
         <p><strong>Time:</strong> <span id="modalTime"></span></p>
         <div class="mt-4 flex justify-end">

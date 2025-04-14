@@ -8,7 +8,7 @@ if (!isset($_SESSION['userId'])) {
     exit();
 }
 
-$seniorId = $_SESSION['userId'];
+$seniorId = $_SESSION['seniorId'];
 
 // Fetch billing transactions
 $billingStmt = $pdo->prepare("
