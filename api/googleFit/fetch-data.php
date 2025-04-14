@@ -68,7 +68,7 @@ $body = [
     // "startTimeMillis" => intval($tenMinsAgo / 1000000),
     // "endTimeMillis" => intval($now / 1000000)
     "bucketByTime" => ["durationMillis" => 60000], // 1 minute
-    "startTimeMillis" => $yesterday,
+    "startTimeMillis" => $tenMinsAgo,
 "endTimeMillis" => $now
 ];
 
