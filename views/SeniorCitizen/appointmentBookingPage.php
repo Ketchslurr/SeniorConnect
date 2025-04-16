@@ -186,28 +186,38 @@ $services = $stmtServices->fetchAll(PDO::FETCH_ASSOC);
     const timeSlots = document.getElementById("timeSlots");
     timeSlots.innerHTML = ""; // Clear previous slots
 
-    const hours = [9, 10, 11, 12, 13, 14, 15, 16];
-    const formattedTimes = hours.map(h => `${h % 12 || 12}:00 ${h < 12 ? "AM" : "PM"}`); // Convert to AM/PM
+    const hours = [8, 9, 10, 11, 12, 13, 14, 15, 16];
+    const formattedTimes = hours.map(h => `${h % 12 || 12}:00 ${h < 12 ? "AM" : "PM"}`);
+
+    const selectedDate = new Date(date); // Date user selected
+    const today = new Date(); // Current date and time
+    const isToday = selectedDate.toDateString() === today.toDateString();
 
     fetch(`../../includes/fetchBookedSlots.php?professionalId=<?= $professionalId ?>&date=${date}`)
         .then(response => response.json())
         .then(bookedSlots => {
-            console.log("Booked Slots:", bookedSlots); // Debugging
+            console.log("Booked Slots:", bookedSlots);
 
-            // Convert booked slots to a Set for faster lookup
             const bookedSet = new Set(bookedSlots.map(slot => slot.trim()));
 
-            formattedTimes.forEach(timeText => {
+            hours.forEach(hour => {
+                const timeText = `${hour % 12 || 12}:00 ${hour < 12 ? "AM" : "PM"}`;
                 if (!document.querySelector(`#timeSlots button[data-time='${timeText}']`)) {
                     const slot = document.createElement("button");
                     slot.textContent = timeText;
                     slot.setAttribute("data-time", timeText);
                     slot.classList.add("p-2", "border", "rounded", "text-center", "cursor-pointer", "hover:bg-blue-100", "m-1");
 
-                    if (bookedSet.has(timeText)) {
+                    // Check if time is already past (only relevant for today)
+                    const slotDateTime = new Date(selectedDate);
+                    slotDateTime.setHours(hour, 0, 0, 0);
+
+                    const isPast = isToday && slotDateTime <= today;
+                    const isBooked = bookedSet.has(timeText);
+
+                    if (isPast || isBooked) {
                         slot.classList.add("bg-gray-400", "cursor-not-allowed", "text-white");
                         slot.disabled = true;
-                        
                     } else {
                         slot.classList.add("bg-white", "text-black", "hover:bg-blue-200");
                         slot.addEventListener("click", function () {
