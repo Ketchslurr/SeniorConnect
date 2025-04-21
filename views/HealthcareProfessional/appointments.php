@@ -31,7 +31,7 @@ $sql = "SELECT a.*, s.fname AS senior_name,
         JOIN seniorcitizen s ON a.seniorId = s.seniorId
         LEFT JOIN payments p ON a.seniorId = p.seniorId
         WHERE a.professionalId = :professionalId
-        ORDER BY a.appointment_date desc";
+        ORDER BY a.created_at desc";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute(['professionalId' => $professionalId]);
