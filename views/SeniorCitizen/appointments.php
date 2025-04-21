@@ -14,7 +14,7 @@ $seniorId = $_SESSION['seniorId'];
 $currentDate = date('Y-m-d');
 
 // Fetch upcoming appointments
-$sql = "SELECT * FROM appointment WHERE seniorId = :seniorId AND appointment_date >= :currentDate ORDER BY appointment_date ASC";
+$sql = "SELECT * FROM appointment WHERE seniorId = :seniorId AND appointment_date >= :currentDate ORDER BY appointment_date desc";
 $stmt = $pdo->prepare($sql);
 $stmt->execute(['seniorId' => $seniorId, 'currentDate' => $currentDate]);
 $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -23,7 +23,8 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $events = [];
 foreach ($appointments as $row) {
     $events[] = [
-        'title' => htmlspecialchars($row['service_name']) . " - " . htmlspecialchars($row['appointment_time']),
+        'title' => htmlspecialchars($row['appointment_time']),
+        // htmlspecialchars($row['service_name']) . " - " . 
         'start' => htmlspecialchars($row['appointment_date']),
         'id' => htmlspecialchars($row['appointmentId']),
         'color' => '#007bff', // Blue color for events
@@ -70,7 +71,7 @@ foreach ($appointments as $row) {
 <div id="appointmentModal" class="fixed inset-0 hidden bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
     <div class="bg-white p-6 rounded-lg shadow-lg w-96 relative z-50">
         <h3 class="text-xl font-bold mb-4">Appointment Details</h3>
-        <p><strong>Service:</strong> <span id="modalService"></span></p>
+        <!-- <p><strong>Service:</strong> <span id="modalService"></span></p> -->
         <p><strong>Time:</strong> <span id="modalTime"></span></p>
         <p><strong>Date:</strong> <span id="modalDate"></span></p>
         <p><strong>Meeting:</strong> <a id="meetLink" href="#" target="_blank" class="text-blue-600 underline">Join Meeting</a></p>
@@ -89,9 +90,10 @@ foreach ($appointments as $row) {
         events: <?= json_encode($events) ?>,
         eventClick: function(info) {
             var details = info.event.title.split(" - ");
-            document.getElementById('modalService').textContent = details[0];
-            document.getElementById('modalTime').textContent = details[1];
-            document.getElementById('modalDate').textContent = info.event.start.toISOString().split('T')[0];
+            // document.getElementById('modalService').textContent = details[0];
+            document.getElementById('modalTime').textContent = details[0];
+            // document.getElementById('modalDate').textContent = info.event.start.toISOString().split('T')[0];
+            document.getElementById('modalDate').textContent = info.event.start.toLocaleDateString('en-CA');
 
             // Use the correct meeting link from FullCalendar event data
             var meetLink = info.event.extendedProps.meetingLink;

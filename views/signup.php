@@ -132,13 +132,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <header class="fixed top-0 left-0 w-full bg-blue-600 text-white shadow-md z-50 py-4">
         <div class="container mx-auto flex justify-between items-center px-6">
             <h2 class="text-2xl font-bold"><a href="../index.php">Senior <span class="text-cyan-300">Connect</span></a></h2>
-            <nav>
+            <!-- <nav>
                 <ul class="flex space-x-6">
                     <li><a href="../index.php" class="hover:underline">Home</a></li>
                     <li><a href="#" class="hover:underline">About Us</a></li>
                     <li><a href="services.php" class="hover:underline">Services</a></li>
                 </ul>
-            </nav>
+            </nav> -->
         </div>
     </header>
 

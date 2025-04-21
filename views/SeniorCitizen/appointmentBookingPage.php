@@ -274,6 +274,8 @@ document.getElementById("finalConfirm").addEventListener("click", function () {
     const selectedDate = document.getElementById("modalDate").textContent;
     const selectedTime = document.getElementById("modalTime").textContent;
     const professionalId = <?= json_encode($professionalId) ?>;
+    this.disabled = true;
+    this.textContent = "Booking...";
 
     fetch("../../includes/bookAppointmentHandler.php", {
         method: "POST",

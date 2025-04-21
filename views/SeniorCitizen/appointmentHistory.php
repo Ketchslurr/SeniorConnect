@@ -56,7 +56,7 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <tr class="bg-blue-500 text-white">
                         <th class="p-3 border">Date</th>
                         <th class="p-3 border">Time</th>
-                        <th class="p-3 border">Service</th>
+                        <!-- <th class="p-3 border">Service</th> -->
                         <th class="p-3 border">Doctor</th>
                         <th class="p-3 border">Appointment Status</th>
                         <th class="p-3 border">Doctor's Response</th>
@@ -70,7 +70,7 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <tr class="text-center border">
                                 <td class="p-3 border"><?php echo date("F j, Y", strtotime($appointment['appointment_date'])); ?></td>
                                 <td class="p-3 border"><?php echo date("g:i A", strtotime($appointment['appointment_time'])); ?></td>
-                                <td class="p-3 border"><?php echo htmlspecialchars($appointment['service_name']); ?></td>
+                                <!-- <td class="p-3 border"><?php echo htmlspecialchars($appointment['service_name']); ?></td> -->
                                 <td class="p-3 border"><?php echo htmlspecialchars($appointment['doctor_fname'] . ' ' . $appointment['doctor_lname']); ?></td>
                                 <td class="p-3 border">
                                     <?php if ($appointment['appointment_status'] == 'Confirmed'): ?>

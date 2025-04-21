@@ -2,6 +2,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 session_start();
+define('APP_SECRET_KEY', '8c9f1a2d59b1c0e5aa33d8e5ef3b7c19'); 
 include '../../config.php'; // Database connection
 
 if (!isset($_SESSION['userId'])) {
@@ -19,6 +20,19 @@ if (!$professionalId || !$date || !$time) {
     echo "<script>alert('Invalid payment request.'); window.location.href='appointments.php';</script>";
     exit();
 }
+// Encrypt the paymentId
+function encryptPaymentId($id, $key) {
+    $cipher = "AES-128-CTR";
+    $iv = '1234567891011121'; // 16 bytes IV (keep it constant or dynamic)
+    return bin2hex(openssl_encrypt($id, $cipher, $key, 0, $iv));
+}
+
+function decryptPaymentId($encryptedId, $key) {
+    $cipher = "AES-128-CTR";
+    $iv = '1234567891011121';
+    return openssl_decrypt(hex2bin($encryptedId), $cipher, $key, 0, $iv);
+}
+
 
 // Fetch doctor's name and consultation fee
 $stmt = $pdo->prepare("SELECT CONCAT(fName, ' ', lName) AS doctor_name, consultationFee 
@@ -58,7 +72,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['payment_proof'])) {
                     ':totalAmount' => $totalAmount,
                     ':payment_proof' => $fileName
                 ]);
-        
+
+                $paymentId = $pdo->lastInsertId();
+                $encryptedId = encryptPaymentId($paymentId, APP_SECRET_KEY);
+
                 // Send notification
                 $notifSql = "INSERT INTO notifications (seniorId, message, link, created_at) 
                              VALUES (:seniorId, :message, :link, NOW())";
@@ -70,6 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['payment_proof'])) {
                 ]);
         
                 echo "<script>localStorage.setItem('showSuccessModal', 'true');</script>";
+                $_SESSION['invoice_url'] = "transactionIdEncryption.php?invoice=" . urlencode($encryptedId);
                 $uploadSuccess = true;
             } catch (PDOException $e) {
                 echo "<script>alert('Database error: " . $e->getMessage() . "');</script>";
@@ -145,6 +163,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['payment_proof'])) {
         <div class="bg-white p-6 rounded-lg shadow-lg text-center">
             <h2 class="text-xl font-bold text-blue-600">Payment Proof Uploaded Successfully!</h2>
             <p class="text-gray-700 mt-2">Please wait for verification.</p>
+            <a href="<?= $_SESSION['invoice_url'] ?? '#' ?>" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700">View Invoice</a>
             <div class="mt-4">
                 <button onclick="window.location.href='seniorCitizenDashboard.php'" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Go to Dashboard</button>
                 <button onclick="closeModal()" class="ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700">Close</button>

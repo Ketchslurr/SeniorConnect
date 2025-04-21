@@ -28,11 +28,11 @@ $totalAppointments = $pdo->query("SELECT COUNT(*) FROM appointment")->fetchColum
                 </a>
             </div>
             
-            <div class="hidden md:flex space-x-8">
+            <!-- <div class="hidden md:flex space-x-8">
                 <a href="index.php" class="hover:text-cyan-200 transition-colors">Home</a>
                 <a href="#" class="hover:text-cyan-200 transition-colors">About us</a>
                 <a href="#" class="hover:text-cyan-200 transition-colors">Services</a>
-            </div>
+            </div> -->
 
             <div class="flex items-center space-x-4">
                 <button onclick="window.location.href='views/login.php'" 

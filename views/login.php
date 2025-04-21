@@ -88,13 +88,13 @@ $googleAuthUrl = $client->createAuthUrl();
             <a href="../index.php" class="text-2xl font-bold">
                 <span class="text-cyan-400">Senior</span> - Connect
             </a>
-            <nav>
+            <!-- <nav>
                 <ul class="flex space-x-6">
                     <li><a href="../index.php" class="hover:text-cyan-300">Home</a></li>
                     <li><a href="#" class="hover:text-cyan-300">About Us</a></li>
                     <li><a href="#" class="hover:text-cyan-300">Services</a></li>
                 </ul>
-            </nav>
+            </nav> -->
         </div>
     </header>
 

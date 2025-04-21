@@ -37,15 +37,26 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute(['professionalId' => $professionalId]);
 $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Remove duplicate appointments based on appointmentId
+$uniqueAppointments = [];
+$seenIds = [];
+
+foreach ($appointments as $appointment) {
+    if (!in_array($appointment['appointmentId'], $seenIds)) {
+        $uniqueAppointments[] = $appointment;
+        $seenIds[] = $appointment['appointmentId'];
+    }
+}
+
 if (empty($appointments)) {
     die("No appointments found for this doctor.");
 }
 
 // Prepare events for FullCalendar
 $events = [];
-foreach ($appointments as $row) {
+foreach ($uniqueAppointments as $row) {
     $events[] = [
-        'title' => htmlspecialchars($row['service_name']) . " - " . htmlspecialchars($row['appointment_time']),
+        'title' => " - " . htmlspecialchars($row['appointment_time']),
         'start' => htmlspecialchars($row['appointment_date']),
         'id' => htmlspecialchars($row['appointmentId']),
         'color' => $row['appointment_status'] == 'Confirmed' ? '#007bff' : ($row['appointment_status'] == 'Cancelled' ? '#dc3545' : 'grey'),
@@ -82,21 +93,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId']) && is
         // Create notification
         createNotification($pdo, $seniorId, $message);
     }
-    // Send notification
-    // $seniorId = $senior['seniorId'];
-
-    // $notifSql = "INSERT INTO notifications (seniorId, message, link, created_at) 
-    // VALUES (:seniorId, :message, :link, NOW())";
-    // $notifStmt = $pdo->prepare($notifSql);
-    // $notifStmt->execute([
-    // 'seniorId' => $seniorId,
-    // 'message' => 'Your appointment has been confirmed. Please come back 15 mins before the appointed time.',
-    // 'link' => '../SeniorCitizen/notifications.php'
-    // ]);
+    
 
     echo json_encode(['status' => 'success', 'message' => 'Appointment updated successfully']);
     exit();
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -159,7 +161,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId']) && is
                 </tr>
             </thead>
             <tbody id="appointmentTableBody">
-                <?php foreach ($appointments as $appointment) : ?>
+                <?php foreach ($uniqueAppointments as $appointment) : ?>
                     <tr class="border-b appointment-row" 
                         data-status="<?= $appointment['appointment_status'] ?>" 
                         data-payment="<?= $appointment['status'] ?>"
