@@ -29,7 +29,8 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $events = [];
 foreach ($appointments as $row) {
     $events[] = [
-        'title' => "Appointment ID: " . htmlspecialchars($row['appointmentId']),
+        // 'title' => "Appointment ID: " . htmlspecialchars($row['appointmentId']),
+        'title' => "Appointment ID: REF-" . str_pad($row['appointmentId'], 6, '0', STR_PAD_LEFT),
         'start' => htmlspecialchars($row['appointment_date']),
         'color' => '#007bff',
         'url' => 'appointments.php?appointmentId=' . htmlspecialchars($row['appointmentId'])
@@ -67,7 +68,8 @@ foreach ($appointments as $row) {
                             foreach ($appointments as $row) { ?>
                                 <a href="appointments.php?appointmentId=<?= htmlspecialchars($row['appointmentId']) ?>" class="block">
                                     <div class="border-l-4 border-green-500 bg-green-100 p-4 hover:bg-green-200 transition">
-                                        <p><strong>Appointment ID:</strong> <?= htmlspecialchars($row['appointmentId']) ?></p>
+                                        <!-- <p><strong>Appointment ID:</strong> <//?= htmlspecialchars($row['appointmentId']) ?></p> -->
+                                        <p><strong>Appointment ID:</strong> <?= 'REF-' . str_pad($row['appointmentId'], 6, '0', STR_PAD_LEFT) ?></p>
                                         <p><strong>Patient Name:</strong> <?= htmlspecialchars($row['fName'] . ' ' . $row['lName']) ?></p>
                                         <p><strong>Age:</strong> <?= htmlspecialchars($row['age']) ?></p>
                                         <p><strong>Gender:</strong> <?= htmlspecialchars($row['gender']) ?></p>

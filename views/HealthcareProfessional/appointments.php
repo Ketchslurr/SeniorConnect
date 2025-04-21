@@ -122,6 +122,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId']) && is
             <!-- List View -->
             <div class="bg-white p-6 rounded-lg shadow-md mb-6">
     <h4 class="text-xl font-bold mb-4">Appointment List</h4>
+    <a href="ePrescription.php?appointmentId=<?= $appointment['appointmentId'] ?>" class="text-blue-500 hover:underline">Add Prescription</a>
 
     <!-- Filters -->
     <div class="flex flex-wrap mb-4 gap-4">
@@ -150,6 +151,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId']) && is
         <table class="w-full border-collapse bg-white shadow-md rounded-lg overflow-hidden">
             <thead class="sticky top-0 bg-blue-500 text-white">
                 <tr>
+                    <th class="py-3 px-4">Appointment No</th>
                     <th class="py-3 px-4">Senior Name</th>
                     <!-- <th class="py-3 px-4">Service</th> -->
                     <th class="py-3 px-4">Date</th>
@@ -167,6 +169,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['appointmentId']) && is
                         data-payment="<?= $appointment['status'] ?>"
                         data-date="<?= $appointment['appointment_date'] ?>"
                         data-name="<?= htmlspecialchars($appointment['senior_name']) ?>">
+                        <!-- <td class="py-3 px-4 text-center"><//?= htmlspecialchars($appointment['appointmentId']) ?></td> -->
+                        <td class="py-3 px-4 text-center"><?= 'REF-' . str_pad($appointment['appointmentId'], 6, '0', STR_PAD_LEFT) ?></td>
                         <td class="py-3 px-4 text-center"><?= htmlspecialchars($appointment['senior_name']) ?></td>
                         <!-- <td class="py-3 px-4 text-center"><//?= htmlspecialchars($appointment['service_name']) ?></td> -->
                         <td class="py-3 px-4 text-center"><?= htmlspecialchars($appointment['appointment_date']) ?></td>

@@ -21,6 +21,7 @@ $events = [];
 foreach ($appointments as $row) {
     $events[] = [
         'title' => "Appointment ID: " . htmlspecialchars($row['appointmentId']),
+        'title' => "Appointment ID: REF-" . str_pad($row['appointmentId'], 6, '0', STR_PAD_LEFT),
         'start' => htmlspecialchars($row['appointment_date']),
         'color' => '#007bff', // Blue color for events
         'url' => 'appointments.php?appointmentId=' . htmlspecialchars($row['appointmentId']) // Make event clickable
@@ -65,7 +66,8 @@ foreach ($appointments as $row) {
                             foreach ($appointments as $row) { ?>
                                 <a href="appointments.php?appointmentId=<?= htmlspecialchars($row['appointmentId']) ?>" class="block">
                                     <div class="border-l-4 border-green-500 bg-green-100 p-4 hover:bg-green-200 transition">
-                                        <p><strong>Appointment ID:</strong> <?= htmlspecialchars($row['appointmentId']) ?></p>
+                                        <!-- <p><strong>Appointment ID:</strong> <//?= htmlspecialchars($row['appointmentId']) ?></p> -->
+                                        <p><strong>Appointment ID:</strong> <?= 'REF-' . str_pad($row['appointmentId'], 6, '0', STR_PAD_LEFT) ?></p>
                                         <p><strong>Date:</strong> <?= htmlspecialchars($row['appointment_date']) ?></p>
                                         <p><strong>Time:</strong> <?= htmlspecialchars($row['appointment_time']) ?></p>
                                         <p><strong>Status:</strong> <?= htmlspecialchars($row['appointment_status']) ?></p>
