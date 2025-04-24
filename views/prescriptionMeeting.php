@@ -40,7 +40,7 @@ if (!$appointment) {
             <p class="mb-4"><strong>Date:</strong> <?= $appointment['appointment_date'] ?></p>
             <form method="post" action="savePrescription.php">
                 <input type="hidden" name="appointmentId" value="<?= $appointmentId ?>">
-                <textarea name="prescription" rows="10" class="w-full p-2 border rounded" placeholder="Enter prescription..."></textarea>
+                <textarea name="prescription" rows="10" class="w-full p-2 border rounded" placeholder="Enter prescription..." required></textarea>
                 <button type="submit" class="mt-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
                     Save Prescription
                 </button>

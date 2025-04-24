@@ -50,7 +50,7 @@ $medicalRecords = $stmtRecords->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     
                     <!-- <label class="block text-lg font-semibold">Name:</label>
-                    <input type="text" name="full_name" value="<?= htmlspecialchars($senior['fName'] . ' ' . $senior['lName']) ?>" class="w-full p-2 border rounded-lg mb-4"> -->
+                    <input type="text" name="full_name" value="<//?= htmlspecialchars($senior['fName'] . ' ' . $senior['lName']) ?>" class="w-full p-2 border rounded-lg mb-4"> -->
                     
                     <label class="block text-lg font-semibold">First Name:</label>
                     <input type="text" name="fname" value="<?= htmlspecialchars($senior['fName']) ?>" class="w-full p-2 border rounded-lg mb-4">
@@ -62,19 +62,19 @@ $medicalRecords = $stmtRecords->fetchAll(PDO::FETCH_ASSOC);
                     <input type="text" name="age" value="<?= htmlspecialchars($senior['age']) ?>" class="w-full p-2 border rounded-lg mb-4">
                     
                     <!-- <label class="block text-lg font-semibold">Contact:</label>
-                    <input type="text" name="contact" value="<?= htmlspecialchars($senior['contact']) ?>" class="w-full p-2 border rounded-lg mb-4">
+                    <input type="text" name="contact" value="<//?= htmlspecialchars($senior['contact']) ?>" class="w-full p-2 border rounded-lg mb-4">
                     
                     <label class="block text-lg font-semibold">Address:</label>
-                    <input type="text" name="address" value="<?= htmlspecialchars($senior['address']) ?>" class="w-full p-2 border rounded-lg mb-4"> -->
+                    <input type="text" name="address" value="<//?= htmlspecialchars($senior['address']) ?>" class="w-full p-2 border rounded-lg mb-4"> -->
                     
-                    <label class="block text-lg font-semibold">Blood Pressure:</label>
-                    <input type="text" name="blood_pressure" value="<?= htmlspecialchars($senior['blood_pressure'] ?? '') ?>" class="w-full p-2 border rounded-lg mb-4">
+                    <!-- <label class="block text-lg font-semibold">Blood Pressure:</label>
+                    <input type="text" name="blood_pressure" value="<//?= htmlspecialchars($senior['blood_pressure'] ?? '') ?>" class="w-full p-2 border rounded-lg mb-4">
 
                     <label class="block text-lg font-semibold">Heart Rate:</label>
-                    <input type="text" name="heart_rate" value="<?= htmlspecialchars($senior['heart_rate'] ?? '') ?>" class="w-full p-2 border rounded-lg mb-4">
+                    <input type="text" name="heart_rate" value="<//?= htmlspecialchars($senior['heart_rate'] ?? '') ?>" class="w-full p-2 border rounded-lg mb-4">
 
                     <label class="block text-lg font-semibold">Oxygen Level:</label>
-                    <input type="text" name="oxygen_level" value="<?= htmlspecialchars($senior['oxygen_level'] ?? '') ?>" class="w-full p-2 border rounded-lg mb-4">
+                    <input type="text" name="oxygen_level" value="<//?= htmlspecialchars($senior['oxygen_level'] ?? '') ?>" class="w-full p-2 border rounded-lg mb-4"> -->
 
 
                     <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Update Profile</button>

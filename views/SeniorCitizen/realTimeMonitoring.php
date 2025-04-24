@@ -201,7 +201,7 @@ if (!$user || empty($user['google_fit_access_token']) || empty($user['google_fit
 
 setInterval(() => {
     fetchData();
-}, 10000);
+}, 100000);
 
         // fetchData();
         // setInterval(fetchData, 10000); // every 10 seconds
