@@ -84,48 +84,88 @@ if (!$user || empty($user['google_fit_access_token']) || empty($user['google_fit
             <pre id="result" class="hidden bg-white p-2 mt-4 rounded shadow text-sm text-gray-800"></pre>
         </div>
     </div>
-
+    <div id="detailsSection" class="mt-6 hidden">
+    <h4 class="text-xl font-semibold mb-2" id="detailsTitle"></h4>
+    <div class="overflow-auto max-h-64">
+        <table class="min-w-full text-sm text-left border border-gray-300 bg-white rounded shadow">
+            <thead class="bg-gray-100 text-gray-600">
+                <tr>
+                    <th class="px-4 py-2">Time</th>
+                    <th class="px-4 py-2">Value</th>
+                </tr>
+            </thead>
+            <tbody id="detailsTable" class="text-gray-700">
+            </tbody>
+        </table>
+    </div>
+</div>
     <script>
-    async function fetchData() {
-        const filter = document.getElementById('filter').value;
+    let fullData = [];
 
-        try {
-            const res = await fetch(`/api/googleFit/fetch-data.php?filter=${filter}`);
-            if (!res.ok) {
-                if (res.status === 401) {
-                    window.location.href = '/api/login-google-fit.php';
-                    return;
-                } else {
-                    throw new Error("API error: " + res.status);
-                }
-            }
+async function fetchData() {
+    const filter = document.getElementById('filter').value;
 
-            const data = await res.json().catch(() => {
-                throw new Error("Invalid JSON response");
-            });
-
-            if (data.length === 0) {
-                document.getElementById("bpmValue").textContent = "--";
-                document.getElementById("stepsValue").textContent = "--";
-                document.getElementById("caloriesValue").textContent = "--";
+    try {
+        const res = await fetch(`/api/googleFit/fetch-data.php?filter=${filter}`);
+        if (!res.ok) {
+            if (res.status === 401) {
+                window.location.href = '/api/login-google-fit.php';
                 return;
+            } else {
+                throw new Error("API error: " + res.status);
             }
-
-            const latest = data[data.length - 1];
-            document.getElementById("bpmValue").textContent = latest.bpm ?? '--';
-            document.getElementById("stepsValue").textContent = latest.steps ?? '--';
-            document.getElementById("caloriesValue").textContent = latest.calories ?? '--';
-
-            document.getElementById("result").textContent = JSON.stringify(data, null, 2);
-
-        } catch (error) {
-            document.getElementById("result").textContent = "Error fetching data.";
-            console.error("Fetch error:", error);
         }
-    }
 
-    setInterval(fetchData, 10000);
-    fetchData();
+        const data = await res.json();
+        fullData = data;
+
+        if (data.length === 0) {
+            document.getElementById("bpmValue").textContent = "--";
+            document.getElementById("stepsValue").textContent = "--";
+            document.getElementById("caloriesValue").textContent = "--";
+            return;
+        }
+
+        const latest = data[data.length - 1];
+        document.getElementById("bpmValue").textContent = latest.bpm ?? '--';
+        document.getElementById("stepsValue").textContent = latest.steps ?? '--';
+        document.getElementById("caloriesValue").textContent = latest.calories ?? '--';
+
+        document.getElementById("result").textContent = JSON.stringify(data, null, 2);
+
+    } catch (error) {
+        console.error("Fetch error:", error);
+        document.getElementById("result").textContent = "Error fetching data.";
+    }
+}
+
+function displayDetails(metric) {
+    const details = fullData
+        .filter(entry => entry[metric] !== undefined)
+        .map(entry => {
+            const date = new Date(entry.time);
+            return `<tr>
+                <td class="px-4 py-2">${date.toLocaleString()}</td>
+                <td class="px-4 py-2">${entry[metric]}</td>
+            </tr>`;
+        });
+
+    document.getElementById("detailsTitle").textContent = {
+        bpm: "❤️ Heart Rate History",
+        steps: "👣 Step Count History",
+        calories: "🔥 Calorie Burn History"
+    }[metric];
+
+    document.getElementById("detailsTable").innerHTML = details.join('');
+    document.getElementById("detailsSection").classList.remove("hidden");
+}
+
+document.getElementById("bpmValue").parentElement.addEventListener('click', () => displayDetails('bpm'));
+document.getElementById("stepsValue").parentElement.addEventListener('click', () => displayDetails('steps'));
+document.getElementById("caloriesValue").parentElement.addEventListener('click', () => displayDetails('calories'));
+
+setInterval(fetchData, 10000);
+fetchData();
     </script>
 </body>
 </html>
