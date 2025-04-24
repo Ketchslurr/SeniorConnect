@@ -147,20 +147,20 @@ foreach ($data['bucket'] as $bucket) {
 }
 
 // Add fake data if empty
-// if (empty($results)) {
-//     $interval = $bucketDuration;
-//     $count = intval($durationMillis / $interval);
+if (empty($results)) {
+    $interval = $bucketDuration;
+    $count = intval($durationMillis / $interval);
 
-//     for ($i = $count - 1; $i >= 0; $i--) {
-//         $timestamp = $now - ($i * $interval);
-//         $results[] = [
-//             'time' => $timestamp,
-//             'bpm' => rand(60, 100),
-//             'steps' => rand(0, 15),
-//             'calories' => round(rand(1, 5) + (rand(0, 9) / 10), 1),
-//             'fake' => true
-//         ];
-//     }
-// }
+    for ($i = $count - 1; $i >= 0; $i--) {
+        $timestamp = $now - ($i * $interval);
+        $results[] = [
+            'time' => $timestamp,
+            'bpm' => rand(60, 100),
+            'steps' => rand(0, 15),
+            'calories' => round(rand(1, 5) + (rand(0, 9) / 10), 1),
+            'fake' => true
+        ];
+    }
+}
 
 echo json_encode($results);
