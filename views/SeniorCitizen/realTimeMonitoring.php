@@ -126,44 +126,6 @@ if (!$user || empty($user['google_fit_access_token']) || empty($user['google_fit
         const stepsChart = makeChart('stepsChart', 'Steps', 'rgb(37, 99, 235)');
         const caloriesChart = makeChart('caloriesChart', 'Calories', 'rgb(34, 197, 94)');
         
-        // async function fetchData() {
-        //     try {
-        //         const res = await fetch('/api/googleFit/fetch-data.php');
-        //         if (!res.ok) {
-        //             if (res.status === 401) {
-        //                 // Redirect to Google login (trigger OAuth flow)
-        //                 window.location.href = '/api/login-google-fit.php';
-        //             } else {
-        //                 throw new Error("API error: " + res.status);
-        //             }
-        //         }
-
-        //         // const data = await res.json();
-        //         const data = await res.json().catch(err => {
-        //             throw new Error("Invalid JSON response");
-        //         });
-        //         if (!res.ok) {
-        //             const text = await res.text(); // Read raw response
-        //             console.error("Full API error response:", text);
-        //             if (res.status === 401) {
-        //                 window.location.href = '/api/login-google-fit.php';
-        //             } else {
-        //                 throw new Error("API error: " + res.status);
-        //             }
-        //         }
-        //         const times = data.map(dp => new Date(dp.time));
-        //         heartChart.data.labels = stepsChart.data.labels = caloriesChart.data.labels = times;
-        //         heartChart.data.datasets[0].data = data.map(dp => dp.bpm ?? null);
-        //         stepsChart.data.datasets[0].data = data.map(dp => dp.steps ?? 0);
-        //         caloriesChart.data.datasets[0].data = data.map(dp => dp.calories ?? 0);
-
-        //         heartChart.update();
-        //         stepsChart.update();
-        //         caloriesChart.update();
-        //     } catch (error) {
-        //         console.error('Failed to fetch data:', error);
-        //     }
-        // }
         async function fetchData() {
     const filter = document.getElementById('filter').value;
 
@@ -201,7 +163,7 @@ if (!$user || empty($user['google_fit_access_token']) || empty($user['google_fit
 
 setInterval(() => {
     fetchData();
-}, 100000);
+}, 10000);
 
         // fetchData();
         // setInterval(fetchData, 10000); // every 10 seconds
