@@ -95,6 +95,10 @@
         <a href="../SeniorCitizen/realTimeMonitoring.php" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
             <span>📡</span><span>Real Time Monitoring</span>
         </a>
+        <a href="myPrescriptions.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200">
+            📝 My Prescriptions
+        </a>
+
     </nav>
 </aside>
 
