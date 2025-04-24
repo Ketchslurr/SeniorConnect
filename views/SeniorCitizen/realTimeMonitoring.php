@@ -20,7 +20,6 @@ if (!$user || empty($user['google_fit_access_token']) || empty($user['google_fit
     exit();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,146 +27,105 @@ if (!$user || empty($user['google_fit_access_token']) || empty($user['google_fit
     <title>Real-Time Monitoring</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
-     <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- Chart.js Date Adapter (using date-fns) -->
-    <script src="https://cdn.jsdelivr.net/npm/date-fns"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 </head>
 <body class="bg-gray-100">
-
     <?php include '../../includes/topbar.php'; ?>
 
     <div class="flex">
-        <!-- Sidebar -->
         <?php include '../../includes/seniorCitizenSidebar.php'; ?>
 
-        <!-- Main Content -->
         <div class="flex-1 p-6">
             <h2 class="text-2xl font-semibold text-gray-700 mb-6">📊 Real-Time Health Monitoring</h2>
-            <!-- Time Filter and Button -->
-        <div class="mb-4">
-        <label for="filter" class="block mb-1 font-medium text-gray-700">Select Time Filter:</label>
-        <select id="filter" class="border border-gray-300 rounded px-3 py-1">
-            <option value="10min">Last 10 Minutes</option>
-            <option value="1h">Last 1 Hour</option>
-            <option value="24h">Last 24 Hours</option>
-            <option value="7d">Last 7 Days</option>
-            <option value="30d">Last 30 Days</option>
-        </select>
 
-        <button onclick="fetchData()" class="ml-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded">
-            Fetch Data
-        </button>
-        </div>
-
-        <!-- <pre id="result" class="bg-white p-2 text-sm text-gray-800 overflow-x-auto rounded shadow"></pre> -->
-        <pre id="result" class="hidden bg-white p-2 text-sm text-gray-800 overflow-x-auto rounded shadow"></pre>
-
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Heart Rate Chart -->
-                <div class="bg-white p-4 rounded-lg shadow">
-                    <h3 class="text-lg font-semibold text-red-600 mb-2">❤️ Heart Rate (BPM)</h3>
-                    <canvas id="heartChart" height="150"></canvas>
+            <!-- Filter + PDF Button -->
+            <div class="mb-4 flex items-center gap-4">
+                <div>
+                    <label for="filter" class="block mb-1 font-medium text-gray-700">Time Filter:</label>
+                    <select id="filter" class="border border-gray-300 rounded px-3 py-1">
+                        <option value="10min">Last 10 Minutes</option>
+                        <option value="1h">Last 1 Hour</option>
+                        <option value="24h">Last 24 Hours</option>
+                        <option value="7d">Last 7 Days</option>
+                        <option value="30d">Last 30 Days</option>
+                    </select>
                 </div>
 
-                <!-- Steps Chart -->
-                <div class="bg-white p-4 rounded-lg shadow">
-                    <h3 class="text-lg font-semibold text-blue-600 mb-2">👣 Steps</h3>
-                    <canvas id="stepsChart" height="150"></canvas>
+                <button onclick="fetchData()" class="mt-6 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                    Fetch Data
+                </button>
+
+                <a href="../../api/googleFit/generateHealthReport.php" target="_blank" class="mt-6 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded">
+                    📄 Download Health Report
+                </a>
+            </div>
+
+            <!-- Numeric Values -->
+            <div id="dataDisplay" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white shadow rounded p-6 text-center">
+                    <h3 class="text-lg text-red-600 font-semibold mb-2">❤️ Heart Rate</h3>
+                    <p id="bpmValue" class="text-3xl font-bold text-red-600">--</p>
+                    <p class="text-sm text-gray-500">BPM</p>
                 </div>
 
-                <!-- Calories Chart -->
-                <div class="bg-white p-4 rounded-lg shadow col-span-1 md:col-span-2">
-                    <h3 class="text-lg font-semibold text-green-600 mb-2">🔥 Calories Burned</h3>
-                    <canvas id="caloriesChart" height="150"></canvas>
+                <div class="bg-white shadow rounded p-6 text-center">
+                    <h3 class="text-lg text-blue-600 font-semibold mb-2">👣 Steps</h3>
+                    <p id="stepsValue" class="text-3xl font-bold text-blue-600">--</p>
+                    <p class="text-sm text-gray-500">Today</p>
+                </div>
+
+                <div class="bg-white shadow rounded p-6 text-center">
+                    <h3 class="text-lg text-green-600 font-semibold mb-2">🔥 Calories Burned</h3>
+                    <p id="caloriesValue" class="text-3xl font-bold text-green-600">--</p>
+                    <p class="text-sm text-gray-500">Total</p>
                 </div>
             </div>
+
+            <!-- Debug / Raw Output (optional) -->
+            <pre id="result" class="hidden bg-white p-2 mt-4 rounded shadow text-sm text-gray-800"></pre>
         </div>
     </div>
 
     <script>
-        const makeChart = (canvasId, label, color) => new Chart(document.getElementById(canvasId).getContext('2d'), {
-            type: 'line',
-            data: {
-                labels: [],
-                datasets: [{
-                    label,
-                    data: [],
-                    borderColor: color,
-                    backgroundColor: color + '33',
-                    fill: true,
-                    tension: 0.3
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    x: {
-                        type: 'time',
-                        time: { unit: 'minute' },
-                        title: { display: true, text: 'Time' }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        title: { display: true, text: label }
-                    }
+    async function fetchData() {
+        const filter = document.getElementById('filter').value;
+
+        try {
+            const res = await fetch(`/api/googleFit/fetch-data.php?filter=${filter}`);
+            if (!res.ok) {
+                if (res.status === 401) {
+                    window.location.href = '/api/login-google-fit.php';
+                    return;
+                } else {
+                    throw new Error("API error: " + res.status);
                 }
             }
-        });
 
-        const heartChart = makeChart('heartChart', 'Heart Rate', 'rgb(239, 68, 68)');
-        const stepsChart = makeChart('stepsChart', 'Steps', 'rgb(37, 99, 235)');
-        const caloriesChart = makeChart('caloriesChart', 'Calories', 'rgb(34, 197, 94)');
-        
-        async function fetchData() {
-    const filter = document.getElementById('filter').value;
+            const data = await res.json().catch(() => {
+                throw new Error("Invalid JSON response");
+            });
 
-    try {
-        const res = await fetch(`/api/googleFit/fetch-data.php?filter=${filter}`);
-        if (!res.ok) {
-            if (res.status === 401) {
-                window.location.href = '/api/login-google-fit.php';
+            if (data.length === 0) {
+                document.getElementById("bpmValue").textContent = "--";
+                document.getElementById("stepsValue").textContent = "--";
+                document.getElementById("caloriesValue").textContent = "--";
                 return;
-            } else {
-                throw new Error("API error: " + res.status);
             }
+
+            const latest = data[data.length - 1];
+            document.getElementById("bpmValue").textContent = latest.bpm ?? '--';
+            document.getElementById("stepsValue").textContent = latest.steps ?? '--';
+            document.getElementById("caloriesValue").textContent = latest.calories ?? '--';
+
+            document.getElementById("result").textContent = JSON.stringify(data, null, 2);
+
+        } catch (error) {
+            document.getElementById("result").textContent = "Error fetching data.";
+            console.error("Fetch error:", error);
         }
-
-        const data = await res.json().catch(() => {
-            throw new Error("Invalid JSON response");
-        });
-
-        document.getElementById('result').textContent = JSON.stringify(data, null, 2);
-
-        const times = data.map(dp => new Date(dp.time));
-        heartChart.data.labels = stepsChart.data.labels = caloriesChart.data.labels = times;
-        heartChart.data.datasets[0].data = data.map(dp => dp.bpm ?? null);
-        stepsChart.data.datasets[0].data = data.map(dp => dp.steps ?? 0);
-        caloriesChart.data.datasets[0].data = data.map(dp => dp.calories ?? 0);
-
-        heartChart.update();
-        stepsChart.update();
-        caloriesChart.update();
-    } catch (error) {
-        document.getElementById('result').textContent = 'Error fetching data.';
-        console.error('Fetch error:', error);
     }
-}
 
-setInterval(() => {
+    setInterval(fetchData, 10000);
     fetchData();
-}, 10000);
-
-        // fetchData();
-        // setInterval(fetchData, 10000); // every 10 seconds
     </script>
-
 </body>
 </html>
