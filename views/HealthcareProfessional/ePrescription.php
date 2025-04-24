@@ -36,6 +36,12 @@ $prescriptions = $prescriptions->fetchAll(PDO::FETCH_ASSOC);
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
+<?php if (isset($_GET['sent'])): ?>
+    <div class="bg-green-200 text-green-800 p-4 text-center">
+        Prescription sent and patient notified successfully.
+    </div>
+<?php endif; ?>
+
 <?php include '../../includes/topbar.php'; ?>
 <div class="flex">
     <?php include '../../includes/healthcareProfessionalSidebar.php'; ?>
