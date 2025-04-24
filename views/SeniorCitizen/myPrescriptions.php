@@ -3,7 +3,7 @@ include '../../config.php';
 session_start();
 
 // Redirect if not logged in or not a senior
-if (!isset($_SESSION['userId']) || $_SESSION['roleId'] != 2) {
+if (!isset($_SESSION['userId']) || $_SESSION['role'] != 2) {
     header("Location: ../../login.php");
     exit();
 }
@@ -36,7 +36,7 @@ $prescriptions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <body class="bg-gray-100">
 <?php include '../../includes/topbar.php'; ?>
 <div class="flex">
-    <?php include '../../includes/seniorSidebar.php'; ?>
+    <?php include '../../includes/seniorCitizenSidebar.php'; ?>
 
     <main class="flex-1 p-6">
         <h2 class="text-2xl font-bold text-center mb-6">My Prescriptions</h2>

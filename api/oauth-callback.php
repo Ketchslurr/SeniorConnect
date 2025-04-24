@@ -12,7 +12,7 @@ $client->addScope([
 ]);
 $client->setAccessType('offline');
 // $client->setRedirectUri('http://localhost/Senior_Connect/api/oauth-callback.php');
-$client->setRedirectUri('https://senior-production-f9d8.up.railway.app/api/oauth-callback.php');
+$client->setRedirectUri('https://seniorconnect-production.up.railway.app/api/oauth-callback.php');
 
 
 // Check if code is set

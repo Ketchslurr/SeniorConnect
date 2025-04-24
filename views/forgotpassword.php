@@ -40,9 +40,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $mail->isHTML(true);
             $mail->Subject = 'Password Reset Request';
             $mail->Body    = "<p>Click the link below to reset your password:</p>
-                <p><a href='http://senior-production-f9d8.up.railway.app/views/resetpassword.php?token=\$token'>Reset Password</a></p>
+                <p><a href='http://seniorconnect-production.up.railway.app/views/resetpassword.php?token=\$token'>Reset Password</a></p>
                 <p>If you did not request a password reset, please ignore this email.</p>";
-            $mail->AltBody = "Click the link to reset your password: http://senior-production-f9d8.up.railway.app/views/resetpassword.php?token=\$token";
+            $mail->AltBody = "Click the link to reset your password: http://seniorconnect-production.up.railway.app/views/resetpassword.php?token=\$token";
             $mail->send();
 
             $_SESSION['message'] = "Password reset email sent! Please check your inbox.";
