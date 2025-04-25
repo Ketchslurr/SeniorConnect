@@ -116,7 +116,8 @@ $response = $http->post($url, [
 ]);
 
 $data = json_decode($response->getBody(), true);
-file_put_contents('fit_debug.json', json_encode($data, JSON_PRETTY_PRINT));
+// file_put_contents('fit_debug.json', json_encode($data, JSON_PRETTY_PRINT));
+file_put_contents(__DIR__ . '/fit_debug.json', json_encode($data, JSON_PRETTY_PRINT));
 $results = [];
 
 foreach ($data['bucket'] as $bucket) {

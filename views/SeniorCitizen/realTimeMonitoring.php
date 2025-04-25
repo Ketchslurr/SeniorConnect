@@ -164,7 +164,7 @@ document.getElementById("bpmValue").parentElement.addEventListener('click', () =
 document.getElementById("stepsValue").parentElement.addEventListener('click', () => displayDetails('steps'));
 document.getElementById("caloriesValue").parentElement.addEventListener('click', () => displayDetails('calories'));
 
-setInterval(fetchData, 10000);
+setInterval(fetchData, 100000);
 fetchData();
     </script>
 </body>
